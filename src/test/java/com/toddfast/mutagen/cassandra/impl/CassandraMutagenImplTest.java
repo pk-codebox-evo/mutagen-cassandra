@@ -1,22 +1,28 @@
 package com.toddfast.mutagen.cassandra.impl;
 
 import com.toddfast.mutagen.cassandra.CassandraMutagen;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
-import com.google.common.collect.ImmutableMap;
 
+import com.google.common.collect.ImmutableMap;
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.Session;
-
 import com.toddfast.mutagen.Plan;
 import com.toddfast.mutagen.State;
+
+import info.archinnov.achilles.junit.AchillesResource;
+import info.archinnov.achilles.junit.AchillesResourceBuilder;
+
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
 import static org.junit.Assert.*;
 
 /**
@@ -167,6 +173,9 @@ public class CassandraMutagenImplTest {
 	////////////////////////////////////////////////////////////////////////////
 
 	private static String keyspace;
-	private static Cluster cluster;
-	private static Session session;
+	
+	@Rule
+	public AchillesResource resource = AchillesResourceBuilder
+			.noEntityPackages().withKeyspaceName(keyspace).build();
+	public Session session = resource.getNativeSession();
 }
