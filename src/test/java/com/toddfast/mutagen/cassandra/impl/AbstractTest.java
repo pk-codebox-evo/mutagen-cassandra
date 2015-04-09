@@ -6,8 +6,6 @@ import static org.junit.Assert.assertTrue;
 import info.archinnov.achilles.junit.AchillesResourceBuilder;
 
 import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.Date;
 
 import org.junit.Before;
 
@@ -39,28 +37,8 @@ public abstract class AbstractTest {
     @Before
     public void init() {
         // purge all table from keyspace
-        purgeKeyspace();
+        DBUtils.purgeKeyspace(session);
     }
-
-    private void purgeKeyspace() {
-
-        // get current keyspace
-        String keyspace = session.getLoggedKeyspace();
-
-        // list all tables of keyspace (equivalent to cqlsh DESCRIBE TABLES)
-        ResultSet rs = session
-                .execute("SELECT columnfamily_name FROM system.schema_columnfamilies where keyspace_name = '"
-                        + keyspace + "' ;");
-
-        // drop all tables
-        while (!rs.isExhausted()) {
-            Row r = rs.one();
-            String tablename = r.getString("columnfamily_name");
-            session.execute("DROP TABLE \"" + tablename + "\";");
-        }
-    }
-
-
     /**
      * Get an instance of cassandra mutagen and mutate the mutations.
      * 
@@ -137,50 +115,6 @@ public abstract class AbstractTest {
     protected Row getByPk(String pk) {
         ResultSet results = query(pk);
         return results.one();
-    }
-
-    /**
-     * Create version schema table manually.
-     */
-    protected void createVersionSchemaTable() {
-        // create table version
-        String createStatement = "CREATE TABLE \"Version\""
-                + "( versionid varchar, filename varchar,checksum varchar,"
-                + "execution_date timestamp,execution_time int,"
-                + "success boolean, PRIMARY KEY(versionid))";
-
-        session.execute(createStatement);
-    }
-
-    /**
-     * add record in the version table.
-     * 
-     * @param version
-     *            version id.
-     * @param filename
-     *            script file name.
-     * @param checksum
-     *            md5 hashage for script file.
-     * @param execution_time
-     *            execution time(ms) for script file.
-     * @param success
-     *            if the execution of script file successes.
-     */
-    protected void appendOneVersionRecord(String version, String filename, String checksum, int execution_time,
-            boolean success) {
-        // insert version record
-        String insertStatement = "INSERT INTO \"Version\" (versionid,filename,checksum,"
-                + "execution_date,execution_time,success) "
-                + "VALUES (?,?,?,?,?,?);";
-
-        PreparedStatement preparedInsertStatement = session.prepare(insertStatement);
-        session.execute(preparedInsertStatement.bind(version,
-                filename,
-                checksum,
-                new Timestamp(new Date().getTime()),
-                execution_time,
-                success
-                ));
     }
 
     public String queryDatabaseForLastState() {

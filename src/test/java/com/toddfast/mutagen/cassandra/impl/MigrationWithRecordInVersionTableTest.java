@@ -23,11 +23,12 @@ public class MigrationWithRecordInVersionTableTest extends AbstractTest {
     @Test
     public void migration_with_record_version_table() {
 
-        createVersionSchemaTable();
+        DBUtils.createSchemaVersionTable(getSession());
         // append two version record
-        appendOneVersionRecord("201502011200", "M201502011200_DoSomeThing_1111.cqlsh.txt",
+        DBUtils.appendVersionRecord(getSession(), "201502011200", "M201502011200_DoSomeThing_1111.cqlsh.txt",
                 "5ac70f706156a3264c518f0c7d754f7f", 112, true);
-        appendOneVersionRecord("201502011209", "M201502011209_DoSomeThing_1111.cqlsh.txt", "", 112, true);
+        DBUtils.appendVersionRecord(getSession(), "201502011209", "M201502011209_DoSomeThing_1111.cqlsh.txt", "",
+                112, true);
 
         // Execute mutations
         mutate("mutations/tests/execution");

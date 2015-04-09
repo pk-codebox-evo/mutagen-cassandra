@@ -17,13 +17,14 @@ import com.toddfast.mutagen.Plan;
 import com.toddfast.mutagen.State;
 import com.toddfast.mutagen.Subject;
 import com.toddfast.mutagen.cassandra.AbstractCassandraMutation;
-import com.toddfast.mutagen.cassandra.CassandraSubject;
 
 /**
  * Generates cassandra migration plans using the initial list of mutations and
  * the specified subject and coordinator.
  */
 public class CassandraPlanner extends BasicPlanner<String> {
+
+    private Session session;
 
     /**
      * Constructor for cassandraPlanner.
@@ -37,6 +38,7 @@ public class CassandraPlanner extends BasicPlanner<String> {
     protected CassandraPlanner(Session session,
             List<String> mutationResources) {
         super(loadMutations(session, mutationResources), null);
+        this.session = session;
     }
 
     /**
@@ -215,13 +217,13 @@ public class CassandraPlanner extends BasicPlanner<String> {
             if (!coordinator.accept(subject, targetState)) {
 
                 // For older states, verify its presence in the database
-                if (((CassandraSubject) subject).isVersionIdPresent(targetState.getID())) {
+                if (DBUtils.isVersionIdPresent(session, targetState.getID())) {
 
                     // Check that the md5 hash of the already executed mutation hasn't changed
 
                     // System.out.println("Checksum for mutation (state=" + targetState + ") is: "
                     // + ((AbstractCassandraMutation) mutation).getChecksum());
-                    if (((CassandraSubject) subject).isMutationHashCorrect(targetState.getID(),
+                    if (DBUtils.isMutationHashCorrect(session, targetState.getID(),
                             ((AbstractCassandraMutation) mutation).getChecksum())) {
                         i.remove();
                     }
@@ -239,7 +241,7 @@ public class CassandraPlanner extends BasicPlanner<String> {
             }
             
             //Test that the mutation hasn't been executed with errors before
-            if (((CassandraSubject) subject).isMutationFailed(targetState.getID()))
+            if (DBUtils.isMutationFailed(session, targetState.getID()))
                     throw new MutagenException("There is a failed mutation in database for script : " + mutation.toString());
         }
 

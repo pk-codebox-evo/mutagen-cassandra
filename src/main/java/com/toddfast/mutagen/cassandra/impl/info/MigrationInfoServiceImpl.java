@@ -14,7 +14,7 @@ public class MigrationInfoServiceImpl implements MigrationInfoService {
 
     private List<MigrationInfoImpl> migrationInfos = new ArrayList<MigrationInfoImpl>();
 
-    private Session session;
+    private final Session session;
 
     private final Comparator<Row> COMPARATOR = new Comparator<Row>() {
         @Override

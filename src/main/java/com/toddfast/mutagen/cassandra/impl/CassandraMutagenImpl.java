@@ -1,22 +1,15 @@
 package com.toddfast.mutagen.cassandra.impl;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.toddfast.mutagen.MutagenException;
-import com.toddfast.mutagen.Mutation;
 import com.toddfast.mutagen.Plan;
 import com.toddfast.mutagen.Planner;
-import com.toddfast.mutagen.basic.ResourceScanner;
-import com.toddfast.mutagen.cassandra.AbstractCassandraMutation;
 import com.toddfast.mutagen.cassandra.CassandraCoordinator;
 import com.toddfast.mutagen.cassandra.CassandraMutagen;
 import com.toddfast.mutagen.cassandra.CassandraSubject;
@@ -30,49 +23,16 @@ import com.toddfast.mutagen.cassandra.impl.info.MigrationInfoServiceImpl;
  */
 public class CassandraMutagenImpl implements CassandraMutagen {
 
+    private List<String> resources;
+
     /**
-     * Search the resources(script files) in the path indicated,
-     * sort them according their datetime, save them.
+     * Loads the resources.
      * 
      */
     @Override
     public void initialize(String rootResourcePath)
             throws IOException {
-
-        try {
-            List<String> discoveredResources =
-                    ResourceScanner.getInstance().getResources(
-                            rootResourcePath, Pattern.compile(".*"),
-                            getClass().getClassLoader());
-
-            // Make sure we found some resources
-            if (discoveredResources.isEmpty()) {
-                throw new IllegalArgumentException("Could not find resources " +
-                        "on path \"" + rootResourcePath + "\"");
-            }
-            // Sort the resources with the comparator
-            Collections.sort(discoveredResources, COMPARATOR);
-
-            // Clean the resources
-            resources = new ArrayList<String>();
-            for (String resource : discoveredResources) {
-                System.out.println("Found mutation resource \"" + resource + "\"");
-
-                if (resource.endsWith(".class")) {
-                    // Remove the file path
-                    resource = resource.substring(
-                            resource.indexOf(rootResourcePath));
-                    if (resource.contains("$")) {
-                        // skip inner classes
-                        continue;
-                    }
-                }
-                resources.add(resource);
-            }
-        } catch (URISyntaxException e) {
-            throw new IllegalArgumentException("Could not find resources on " +
-                    "path \"" + rootResourcePath + "\"", e);
-        }
+        resources = LoadResources.loadResources(rootResourcePath, this);
     }
 
     /**
@@ -80,8 +40,24 @@ public class CassandraMutagenImpl implements CassandraMutagen {
      *
      * @return resources
      */
-    public List<String> getResources() {
+    private List<String> getResources() {
         return resources;
+    }
+
+    /**
+     * Retrive a plan of mutations.
+     * 
+     * @return mutations plan
+     */
+    private Plan<String> getMutationsPlan(Session session) {
+        CassandraCoordinator coordinator = new CassandraCoordinator(session);
+        CassandraSubject subject = new CassandraSubject(session);
+
+        Planner<String> planner =
+                new CassandraPlanner(session, getResources());
+        Plan<String> plan = planner.getPlan(subject, coordinator);
+
+        return plan;
     }
 
     /**
@@ -96,128 +72,13 @@ public class CassandraMutagenImpl implements CassandraMutagen {
         // synchronization is going to have to happen in the coordinator.
 
         synchronized (System.class) {
-
-            CassandraCoordinator coordinator = new CassandraCoordinator(session);
-            CassandraSubject subject = new CassandraSubject(session);
-
-            Planner<String> planner =
-                    new CassandraPlanner(session, getResources());
-            Plan<String> plan = planner.getPlan(subject, coordinator);
-
-            // Execute the plan
-            Plan.Result<String> result = plan.execute();
-
-            return result;
+            return getMutationsPlan(session).execute();
         }
     }
 
-
-    @Override
-    public void baseline(Session session, String lastCompletedState) {
-
-        System.out.println("Baseline...");
-
-        synchronized (System.class) {
-
-            CassandraCoordinator coordinator = new CassandraCoordinator(session);
-            CassandraSubject subject = new CassandraSubject(session);
-
-            // create Version table if not exists
-            subject.createSchemaVersionTable();
-
-            ResultSet rs = session.execute("SELECT * FROM \"Version\";");
-            if( !rs.isExhausted())
-                throw new MutagenException("Tabble Version is not empty, please clean before executing baseline");
-
-            Planner<String> planner =
-                    new CassandraPlanner(session, getResources());
-            Plan<String> plan = planner.getPlan(subject, coordinator);
-
-            // Dummy execution of all mutations with state inferior of equal to lastCompletedState
-            for (Mutation<String> m : plan.getMutations()) {
-
-                if (m.getResultingState().getID().compareTo(lastCompletedState) <= 0)
-                    try {
-                        ((AbstractCassandraMutation) m).dummyExecution();
-                    } catch (Exception e) {
-                        throw new MutagenException("Dummy execution failed for mutation : " + m.toString(), e);
-                    }
-            }
-
-        }
-        System.out.println("Done");
-
-    }
-
     /**
-     * Retrives the complete information about all the migrations.
-     * 
-     * @param session
-     *            - the session to execute the cql.
-     * @return instance of MigrationInfoService.
+     * Drop version table.
      */
-    public MigrationInfoService info(Session session) {
-        return new MigrationInfoServiceImpl(session);
-    }
-
-    // //////////////////////////////////////////////////////////////////////////
-    // Fields
-    // //////////////////////////////////////////////////////////////////////////
-
-
-    /**
-     * Sorts by root file name, ignoring path and file extension
-     * 
-     */
-    private static final Comparator<String> COMPARATOR =
-            new Comparator<String>() {
-                @Override
-                public int compare(String path1, String path2) {
-                    final String origPath1 = path1;
-                    final String origPath2 = path2;
-
-                    try {
-
-                        int index1 = path1.lastIndexOf("/");
-                        int index2 = path2.lastIndexOf("/");
-
-                        String file1;
-                        if (index1 != -1) {
-                            file1 = path1.substring(index1 + 1);
-                        }
-                        else {
-                            file1 = path1;
-                        }
-
-                        String file2;
-                        if (index2 != -1) {
-                            file2 = path2.substring(index2 + 1);
-                        }
-                        else {
-                            file2 = path2;
-                        }
-
-                        index1 = file1.lastIndexOf(".");
-                        index2 = file2.lastIndexOf(".");
-
-                        if (index1 > 1) {
-                            file1 = file1.substring(0, index1);
-                        }
-
-                        if (index2 > 1) {
-                            file2 = file2.substring(0, index2);
-                        }
-
-                        return file1.compareTo(file2);
-                    }
-                    catch (StringIndexOutOfBoundsException e) {
-                        throw new StringIndexOutOfBoundsException(e.getMessage() +
-                                " (path1: \"" + origPath1 +
-                                "\", path2: \"" + origPath2 + "\")");
-                    }
-                }
-            };
-
     @Override
     public void clean(Session session) {
         System.out.println("Cleaning...");
@@ -227,6 +88,9 @@ public class CassandraMutagenImpl implements CassandraMutagen {
 
     }
 
+    /**
+     * delete the failed records in the version table.
+     */
     @Override
     public void repair(Session session) {
         System.out.println("Repairing...");
@@ -248,7 +112,31 @@ public class CassandraMutagenImpl implements CassandraMutagen {
 
     }
 
-    // @AllowField
-    private List<String> resources;
+    /**
+     * baseline
+     */
+    @Override
+    public void baseline(Session session, String lastCompletedState) throws MutagenException {
+
+        System.out.println("Baseline...");
+
+        synchronized (System.class) {
+            Plan<String> mutationsPlan = getMutationsPlan(session);
+            new BaseLine(session, lastCompletedState, mutationsPlan).baseLine();
+        }
+        System.out.println("Done");
+
+    }
+
+    /**
+     * Retrives the complete information about all the migrations.
+     * 
+     * @param session
+     *            - the session to execute the cql.
+     * @return instance of MigrationInfoService.
+     */
+    public MigrationInfoService info(Session session) {
+        return new MigrationInfoServiceImpl(session);
+    }
 
 }

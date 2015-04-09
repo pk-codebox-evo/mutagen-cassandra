@@ -3,15 +3,13 @@ package com.toddfast.mutagen.cassandra;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.sql.Timestamp;
-import java.util.Date;
 
-import com.datastax.driver.core.PreparedStatement;
 import com.datastax.driver.core.Session;
 import com.toddfast.mutagen.MutagenException;
 import com.toddfast.mutagen.Mutation;
 import com.toddfast.mutagen.State;
 import com.toddfast.mutagen.basic.SimpleState;
+import com.toddfast.mutagen.cassandra.impl.DBUtils;
 
 /**
  * Base class for cassandra mutation.
@@ -131,36 +129,7 @@ public abstract class AbstractCassandraMutation implements Mutation<String> {
      */
     protected abstract String getResourceName();
 
-    /**
-     * append the version record in the table Version.
-     * 
-     * @param version
-     *            Id of version record,usually represented by the datetime.
-     * @param filename
-     *            name of script file that was executed.
-     * @param checksum
-     *            checksum for validation.
-     * @param execution_time
-     *            The execution time(ms) for this script file.
-     * @param success
-     *            represents if this execution successes.
-     */
-    protected void appendVersionRecord(String version, String filename, String checksum, int execution_time,
-            boolean success) {
-        // insert statement for version record
-        String insertStatement = "INSERT INTO \"" + versionSchemaTable + "\" (versionid,filename,checksum,"
-                + "execution_date,execution_time,success) "
-                + "VALUES (?,?,?,?,?,?);";
-        // prepare statement
-        PreparedStatement preparedInsertStatement = session.prepare(insertStatement);
-        session.execute(preparedInsertStatement.bind(version,
-                filename,
-                checksum,
-                new Timestamp(new Date().getTime()),
-                execution_time,
-                success
-                ));
-    }
+
 
     /**
      * Performs the actual mutation and then updates the recorded schema version.
@@ -191,7 +160,7 @@ public abstract class AbstractCassandraMutation implements Mutation<String> {
         String checksum = getChecksum();
 
         // append version record
-        appendVersionRecord(version, getResourceName(), checksum, (int) execution_time, success);
+        DBUtils.appendVersionRecord(session, version, getResourceName(), checksum, (int) execution_time, success);
 
         if (runtimeException != null)
             throw runtimeException;
@@ -275,7 +244,7 @@ public abstract class AbstractCassandraMutation implements Mutation<String> {
         String checksum = getChecksum();
 
         // append version record
-        appendVersionRecord(version, getResourceName(), checksum, 0, true);
+        DBUtils.appendVersionRecord(session, version, getResourceName(), checksum, 0, true);
     }
     
     // //////////////////////////////////////////////////////////////////////////
@@ -287,8 +256,6 @@ public abstract class AbstractCassandraMutation implements Mutation<String> {
     private String cqlMigrationSeparator = "_"; // script separator
 
     private Session session; // session
-
-    private String versionSchemaTable = "Version"; // version table name
 
     private State<String> state;
 

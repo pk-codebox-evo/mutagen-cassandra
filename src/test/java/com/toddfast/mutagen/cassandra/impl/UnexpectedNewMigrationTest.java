@@ -13,10 +13,10 @@ public class UnexpectedNewMigrationTest extends AbstractTest {
     @Test(expected = MutagenException.class)
     public void testAddedScriptWithInferiorState() {
 
-        createVersionSchemaTable();
+        DBUtils.createSchemaVersionTable(getSession());
 
         // mutation with versionId ending with 2
-        appendOneVersionRecord("201501010002", "Foo", "", 0, true);
+        DBUtils.appendVersionRecord(getSession(), "201501010002", "Foo", "", 0, true);
 
         // try to mutate with script ending in 1
         mutate("mutations/tests/unexpected_new_migration");
