@@ -1,10 +1,11 @@
-package com.toddfast.mutagen.cassandra.impl;
+package com.toddfast.mutagen.cassandra.impl.baseline;
 
 import com.datastax.driver.core.Session;
 import com.toddfast.mutagen.MutagenException;
 import com.toddfast.mutagen.Mutation;
 import com.toddfast.mutagen.Plan;
 import com.toddfast.mutagen.cassandra.AbstractCassandraMutation;
+import com.toddfast.mutagen.cassandra.util.DBUtils;
 
 public class BaseLine {
     // Fields

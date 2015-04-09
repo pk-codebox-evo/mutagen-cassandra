@@ -3,6 +3,7 @@ package com.toddfast.mutagen.cassandra.impl;
 import org.junit.Test;
 
 import com.toddfast.mutagen.MutagenException;
+import com.toddfast.mutagen.cassandra.util.DBUtils;
 
 
 public class UnexpectedNewMigrationTest extends AbstractTest {

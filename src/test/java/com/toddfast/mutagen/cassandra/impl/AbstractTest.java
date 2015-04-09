@@ -16,6 +16,7 @@ import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.toddfast.mutagen.Plan;
 import com.toddfast.mutagen.cassandra.CassandraMutagen;
+import com.toddfast.mutagen.cassandra.util.DBUtils;
 
 /**
  * 

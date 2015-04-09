@@ -3,7 +3,7 @@ package com.toddfast.mutagen.cassandra;
 import com.datastax.driver.core.Session;
 import com.toddfast.mutagen.State;
 import com.toddfast.mutagen.Subject;
-import com.toddfast.mutagen.cassandra.impl.DBUtils;
+import com.toddfast.mutagen.cassandra.util.DBUtils;
 
 /**
  * Cassandra subject represents the table Version.

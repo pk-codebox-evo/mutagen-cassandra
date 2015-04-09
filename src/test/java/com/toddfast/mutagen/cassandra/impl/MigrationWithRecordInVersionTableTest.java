@@ -8,6 +8,7 @@ import java.util.List;
 import org.junit.Test;
 
 import com.toddfast.mutagen.Mutation;
+import com.toddfast.mutagen.cassandra.util.DBUtils;
 
 
 public class MigrationWithRecordInVersionTableTest extends AbstractTest {

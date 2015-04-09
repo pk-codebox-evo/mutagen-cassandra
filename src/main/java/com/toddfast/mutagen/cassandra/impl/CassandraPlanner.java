@@ -17,6 +17,7 @@ import com.toddfast.mutagen.Plan;
 import com.toddfast.mutagen.State;
 import com.toddfast.mutagen.Subject;
 import com.toddfast.mutagen.cassandra.AbstractCassandraMutation;
+import com.toddfast.mutagen.cassandra.util.DBUtils;
 
 /**
  * Generates cassandra migration plans using the initial list of mutations and

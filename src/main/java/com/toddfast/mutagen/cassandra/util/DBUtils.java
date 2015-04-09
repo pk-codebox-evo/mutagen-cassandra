@@ -1,4 +1,4 @@
-package com.toddfast.mutagen.cassandra.impl;
+package com.toddfast.mutagen.cassandra.util;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
