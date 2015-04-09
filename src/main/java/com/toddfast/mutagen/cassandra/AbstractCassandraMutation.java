@@ -19,6 +19,17 @@ import com.toddfast.mutagen.cassandra.impl.DBUtils;
  * 
  */
 public abstract class AbstractCassandraMutation implements Mutation<String> {
+    // //////////////////////////////////////////////////////////////////////////
+    // Fields
+    // //////////////////////////////////////////////////////////////////////////
+
+    private String fileSeparator = "/"; // file separator
+
+    private String cqlMigrationSeparator = "_"; // script separator
+
+    private Session session; // session
+
+    private State<String> state;
     /**
      * Constructor for AbstractCassandraMutation.
      * 
@@ -247,16 +258,4 @@ public abstract class AbstractCassandraMutation implements Mutation<String> {
         DBUtils.appendVersionRecord(session, version, getResourceName(), checksum, 0, true);
     }
     
-    // //////////////////////////////////////////////////////////////////////////
-    // Fields
-    // //////////////////////////////////////////////////////////////////////////
-
-    private String fileSeparator = "/"; // file separator
-
-    private String cqlMigrationSeparator = "_"; // script separator
-
-    private Session session; // session
-
-    private State<String> state;
-
 }

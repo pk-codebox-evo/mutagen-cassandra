@@ -1,11 +1,8 @@
 package com.toddfast.mutagen.cassandra.impl;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.toddfast.mutagen.MutagenException;
 import com.toddfast.mutagen.Plan;
@@ -83,7 +80,7 @@ public class CassandraMutagenImpl implements CassandraMutagen {
     public void clean(Session session) {
         System.out.println("Cleaning...");
         // TRUNCATE instead of drop ?
-        session.execute("DROP TABLE IF EXISTS \"Version\";");
+        DBUtils.dropSchemaVersionTable(session);
         System.out.println("Done");
 
     }
@@ -94,20 +91,7 @@ public class CassandraMutagenImpl implements CassandraMutagen {
     @Override
     public void repair(Session session) {
         System.out.println("Repairing...");
-        ResultSet rs = session.execute("SELECT * FROM \"Version\";");
-        List<Row> selectedRows = new ArrayList<Row>();
-
-        while (!rs.isExhausted()) {
-            Row r = rs.one();
-            if (!r.getBool("success"))
-                selectedRows.add(r);
-        }
-        rs.all();
-        System.out.println(selectedRows.size() + " database entrie(s) have been selected for deletion : ");
-        for (Row r : selectedRows) {
-            System.out.println(" - " + r.toString());
-            session.execute("DELETE FROM \"Version\" WHERE versionid = '" + r.getString("versionid") + "';");
-        }
+        DBUtils.deleteFailedVersionRecord(session);
         System.out.println("Done");
 
     }

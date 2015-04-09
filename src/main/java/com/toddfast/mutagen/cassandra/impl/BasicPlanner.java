@@ -27,17 +27,23 @@ import com.toddfast.mutagen.basic.BasicContext;
 public class BasicPlanner<I extends Comparable<I>> implements Planner<I> {
 
     /**
-	 *
-	 *
-	 */
+     * Constructor BasicPlanner.
+     * 
+     * @param allMutations
+     *            - all the mutations to execute.
+     */
     public BasicPlanner(Collection<Mutation<I>> allMutations) {
         this(allMutations, null);
     }
 
     /**
-	 *
-	 *
-	 */
+     * Constructor BasicPlanner.
+     * 
+     * @param allMutations
+     *            - all the mutation to execute.
+     * @param comparator
+     *            - a comparator to compare the mutations.
+     */
     public BasicPlanner(Collection<Mutation<I>> allMutations,
             Comparator<Mutation<I>> comparator) {
         super();
@@ -48,9 +54,8 @@ public class BasicPlanner<I extends Comparable<I>> implements Planner<I> {
     }
 
     /**
-	 *
-	 *
-	 */
+     * Get the mutations plan.
+     */
     @Override
     public Plan<I> getPlan(Subject<I> subject, Coordinator<I> coordinator) {
 
@@ -70,9 +75,12 @@ public class BasicPlanner<I extends Comparable<I>> implements Planner<I> {
     }
 
     /**
-	 *
-	 *
-	 */
+     * Execute the mutations plan.
+     * 
+     * @param plan
+     *            - mutations plan.
+     * @return mutations result.
+     */
     private BasicResult executePlan(BasicPlan plan) {
 
         List<Mutation<I>> completedMutations = new ArrayList<Mutation<I>>();
@@ -110,9 +118,14 @@ public class BasicPlanner<I extends Comparable<I>> implements Planner<I> {
     }
 
     /**
-	 *
-	 *
-	 */
+     * Create a mutation context.
+     * 
+     * @param subject
+     *            - mutation suject.
+     * @param coordinator
+     *            - mutation coordinator.
+     * @return
+     */
     protected Context createContext(Subject<I> subject,
             Coordinator<I> coordinator) {
         return new BasicContext(subject, coordinator);
@@ -126,16 +139,8 @@ public class BasicPlanner<I extends Comparable<I>> implements Planner<I> {
     // Types
     // //////////////////////////////////////////////////////////////////////////
 
-    /**
-	 *
-	 *
-	 */
     public class BasicPlan implements com.toddfast.mutagen.Plan<I> {
 
-        /**
-		 *
-		 *
-		 */
         public BasicPlan(Subject<I> subject, Coordinator<I> coordinator,
                 List<Mutation<I>> mutations) {
             super();
@@ -144,37 +149,20 @@ public class BasicPlanner<I extends Comparable<I>> implements Planner<I> {
             this.mutations = mutations;
         }
 
-        /**
-		 *
-		 *
-		 */
         @Override
         public Subject<I> getSubject() {
             return subject;
         }
-
-        /**
-		 *
-		 *
-		 */
         @Override
         public Coordinator<I> getCoordinator() {
             return coordinator;
         }
 
-        /**
-		 *
-		 *
-		 */
         @Override
         public List<Mutation<I>> getMutations() {
             return Collections.unmodifiableList(mutations);
         }
 
-        /**
-		 *
-		 *
-		 */
         @Override
         public Result<I> execute()
                 throws MutagenException {
@@ -191,17 +179,7 @@ public class BasicPlanner<I extends Comparable<I>> implements Planner<I> {
     // //////////////////////////////////////////////////////////////////////////
     // Types
     // //////////////////////////////////////////////////////////////////////////
-
-    /**
-	 *
-	 *
-	 */
     public class BasicResult implements com.toddfast.mutagen.Plan.Result<I> {
-
-        /**
-		 *
-		 *
-		 */
         private BasicResult(BasicPlan plan,
                 Subject<I> subject,
                 List<Mutation<I>> completedMutations,
@@ -217,55 +195,31 @@ public class BasicPlanner<I extends Comparable<I>> implements Planner<I> {
             this.exception = exception;
         }
 
-        /**
-		 *
-		 *
-		 */
         @Override
         public com.toddfast.mutagen.Plan<I> getPlan() {
             return plan;
         }
 
-        /**
-		 *
-		 *
-		 */
         @Override
         public boolean isMutationComplete() {
             return remainingMutations.isEmpty();
         }
 
-        /**
-		 *
-		 *
-		 */
         @Override
         public State<I> getLastState() {
             return lastState;
         }
 
-        /**
-		 *
-		 *
-		 */
         @Override
         public List<Mutation<I>> getCompletedMutations() {
             return completedMutations;
         }
 
-        /**
-		 *
-		 *
-		 */
         @Override
         public List<Mutation<I>> getRemainingMutations() {
             return remainingMutations;
         }
 
-        /**
-		 *
-		 *
-		 */
         @Override
         public MutagenException getException() {
             return exception;
@@ -288,13 +242,6 @@ public class BasicPlanner<I extends Comparable<I>> implements Planner<I> {
     // Fields
     // //////////////////////////////////////////////////////////////////////////
 
-    public static final Comparator<Mutation<?>> COMPARATOR =
-            new Comparator<Mutation<?>>() {
-                @Override
-                public int compare(Mutation m1, Mutation m2) {
-                    return m1.getResultingState().compareTo(m2.getResultingState());
-                }
-            };
 
     private List<Mutation<I>> mutations;
 }

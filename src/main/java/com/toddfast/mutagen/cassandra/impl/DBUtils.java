@@ -1,6 +1,7 @@
 package com.toddfast.mutagen.cassandra.impl;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -49,6 +50,13 @@ public class DBUtils {
     }
 
     /**
+     * Drop table Version.
+     */
+    public static void dropSchemaVersionTable(Session session) {
+        String dropStatement = "DROP TABLE IF EXISTS \"Version\";";
+        session.execute(dropStatement);
+    }
+    /**
      * Execute query in the table Version.
      * 
      * @return
@@ -63,6 +71,13 @@ public class DBUtils {
         return session.execute(selectStatement);
     }
 
+    /**
+     * check if the table is empty.
+     * 
+     * @param session
+     *            - the session to execute cql.
+     * @return - bool
+     */
     public static boolean isEmptyVersionTable(Session session) {
         ResultSet rs = session.execute("SELECT * FROM \"Version\";");
         if (rs.isExhausted())
@@ -105,7 +120,7 @@ public class DBUtils {
     }
 
     /**
-     * Find record for a given versionId
+     * Retrive record for a given versionId
      * 
      * @param versionId
      * @return Result set with one row if versionId present, empty otherwise
@@ -117,6 +132,41 @@ public class DBUtils {
         return session.execute(selectStatement);
     }
 
+    /**
+     * delete version record.
+     * 
+     * @param session
+     *            - the session to execute cql.
+     * @param versionid
+     *            - version id.
+     */
+    public static void deleteVersionRecord(Session session, String versionid) {
+        String deleteStatement = "DELETE FROM \"Version\" WHERE versionid = '" + versionid + "';";
+        session.execute(deleteStatement);
+    }
+
+    /**
+     * delete all failed version records.
+     * 
+     * @param session
+     *            - the session to execute cql.
+     */
+    public static void deleteFailedVersionRecord(Session session) {
+        ResultSet rs = getVersionRecord(session);
+        List<Row> selectedRows = new ArrayList<Row>();
+
+        while (!rs.isExhausted()) {
+            Row r = rs.one();
+            if (!r.getBool("success"))
+                selectedRows.add(r);
+        }
+        rs.all();
+        System.out.println(selectedRows.size() + " database entrie(s) have been selected for deletion : ");
+        for (Row r : selectedRows) {
+            System.out.println(" - " + r.toString());
+            deleteVersionRecord(session, r.getString("versionid"));
+        }
+    }
     /**
      * Check if the versionId exists in the database.
      * 
@@ -143,6 +193,17 @@ public class DBUtils {
         return false;
     }
 
+    /**
+     * check if the mutation checksum changes.
+     * 
+     * @param session
+     *            - the session to execute cql.
+     * @param versionId
+     *            - version id.
+     * @param hash
+     *            - mutation hash.
+     * @return bool
+     */
     public static boolean isMutationHashCorrect(Session session, String versionId, String hash) {
         String selectStatement = "SELECT checksum FROM \"" +
                 "Version" + "\" WHERE versionid = '" + versionId + "'";

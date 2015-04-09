@@ -15,6 +15,11 @@ import com.toddfast.mutagen.cassandra.impl.DBUtils;
  */
 public class CassandraSubject implements Subject<String> {
 
+    // //////////////////////////////////////////////////////////////////////////
+    // Fields
+    // //////////////////////////////////////////////////////////////////////////
+
+    private Session session; // session
     /**
      * Constructor for cassandraSubjet.
      * 
@@ -24,11 +29,6 @@ public class CassandraSubject implements Subject<String> {
      */
     public CassandraSubject(Session session) {
         super();
-        if (session == null) {
-            throw new IllegalArgumentException(
-                    "Parameter \"keyspace\" cannot be null");
-        }
-
         this.session = session;
     }
 
@@ -36,12 +36,4 @@ public class CassandraSubject implements Subject<String> {
     public State<String> getCurrentState() {
         return DBUtils.getCurrentState(session);
     }
-
-
-    // //////////////////////////////////////////////////////////////////////////
-    // Fields
-    // //////////////////////////////////////////////////////////////////////////
-
-    private Session session; // session
-
 }

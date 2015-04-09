@@ -12,7 +12,11 @@ import com.toddfast.mutagen.Subject;
  * 
  */
 public class CassandraCoordinator implements Coordinator<String> {
+    // //////////////////////////////////////////////////////////////////////////
+    // Fields
+    // //////////////////////////////////////////////////////////////////////////
 
+    private Session session; // session
     /**
      * Constructor for cassandra coordinator.
      * 
@@ -54,11 +58,4 @@ public class CassandraCoordinator implements Coordinator<String> {
         return targetState.getID().compareTo(currentState.getID()) > 0;
 
     }
-
-    // //////////////////////////////////////////////////////////////////////////
-    // Fields
-    // //////////////////////////////////////////////////////////////////////////
-
-    private Session session; // session
-
 }
