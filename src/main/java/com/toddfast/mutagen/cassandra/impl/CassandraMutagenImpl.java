@@ -49,7 +49,7 @@ public class CassandraMutagenImpl implements CassandraMutagen {
      * 
      * @return mutations plan
      */
-    private Plan<String> getMutationsPlan(Session session) {
+    public Plan<String> getMutationsPlan(Session session) {
         CassandraCoordinator coordinator = new CassandraCoordinator(session);
         CassandraSubject subject = new CassandraSubject(session);
 
@@ -108,8 +108,7 @@ public class CassandraMutagenImpl implements CassandraMutagen {
         System.out.println("Baseline...");
 
         synchronized (System.class) {
-            Plan<String> mutationsPlan = getMutationsPlan(session);
-            new BaseLine(session, lastCompletedState, mutationsPlan).baseLine();
+            new BaseLine(this, session, lastCompletedState).baseLine();
         }
         System.out.println("Done");
 
