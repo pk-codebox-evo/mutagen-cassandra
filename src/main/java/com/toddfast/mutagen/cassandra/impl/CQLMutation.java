@@ -204,11 +204,11 @@ public class CQLMutation extends AbstractCassandraMutation {
     protected void performMutation(Context context) {
         context.debug("Executing mutation {}", getResultingState().getID());
         for (String statement : statements) {
-            context.debug("Executing CQL \"{}\"", statement);
+            context.debug("Executing CQL statement \"{}\"", statement);
             try {
                 // execute the cql statement
                 ResultSet result = getSession().execute(statement);
-                context.info("Successfully executed CQL \"{}\" in {} attempts",
+                context.debug("Successfully executed CQL statement \"{}\" in {} attempts",
                         statement, result);
             } catch (QueryValidationException e) {
                 context.error("Statement Validatation Exception executing CQL \"{}\"", statement, e);
@@ -220,7 +220,7 @@ public class CQLMutation extends AbstractCassandraMutation {
                         statement + "\"", e);
             }
         }
-        context.debug("Done executing mutation {}", getResultingState().getID());
+        context.info("Done executing mutation {}", getResultingState().getID());
     }
 
     // //////////////////////////////////////////////////////////////////////////

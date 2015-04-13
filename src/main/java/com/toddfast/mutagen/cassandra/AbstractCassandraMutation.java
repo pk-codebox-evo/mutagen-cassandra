@@ -10,6 +10,8 @@ import com.toddfast.mutagen.Mutation;
 import com.toddfast.mutagen.State;
 import com.toddfast.mutagen.basic.SimpleState;
 import com.toddfast.mutagen.cassandra.util.DBUtils;
+import com.toddfast.mutagen.cassandra.util.logging.Log;
+import com.toddfast.mutagen.cassandra.util.logging.LogFactory;
 
 /**
  * Base class for cassandra mutation.
@@ -22,6 +24,8 @@ public abstract class AbstractCassandraMutation implements Mutation<String> {
     // //////////////////////////////////////////////////////////////////////////
     // Fields
     // //////////////////////////////////////////////////////////////////////////
+
+    private Log log = LogFactory.getLog(AbstractCassandraMutation.class);
 
     private String fileSeparator = "/"; // file separator
 
@@ -37,7 +41,6 @@ public abstract class AbstractCassandraMutation implements Mutation<String> {
      *            the session to execute cql statement
      */
     public AbstractCassandraMutation(Session session) {
-
         this.session = session;
         this.state = null;
     }
@@ -49,12 +52,9 @@ public abstract class AbstractCassandraMutation implements Mutation<String> {
      */
     @Override
     public String toString() {
-        if (getResultingState() != null) {
-            return getResourceName() + "[state=" + getResultingState().getID() + "]";
-        }
-        else {
-            return getResourceName();
-        }
+
+        return getResourceName() + "[state=" + getResultingState().getID() + "]";
+
     }
 
     /**
@@ -69,6 +69,8 @@ public abstract class AbstractCassandraMutation implements Mutation<String> {
      *         the state of a resource.
      */
     protected final State<String> parseVersion(String resourceName) {
+        log.trace("Entering parseVersion(resourceName={})", resourceName);
+
         String versionString = resourceName;
         int index = versionString.lastIndexOf(fileSeparator);
         if (versionString.lastIndexOf(fileSeparator) != -1) {
@@ -96,6 +98,7 @@ public abstract class AbstractCassandraMutation implements Mutation<String> {
                 buffer.append(c);
             }
         }
+        log.trace("Leaving parseVersion() : {}", buffer);
 
         return new SimpleState<String>(buffer.toString());
     }
@@ -127,10 +130,13 @@ public abstract class AbstractCassandraMutation implements Mutation<String> {
      */
     @Override
     public State<String> getResultingState() {
-        if (state != null)
-            return state;
-        else
-            return state = parseVersion(getResourceName());
+        log.trace("Entering getResultingState()");
+
+        if (state == null)
+            state = parseVersion(getResourceName());
+
+        log.trace("Leaving getResultingState() : {}", state);
+        return state;
     }
 
     /**
@@ -150,12 +156,17 @@ public abstract class AbstractCassandraMutation implements Mutation<String> {
     public final void mutate(Context context)
             throws MutagenException {
 
+        log.trace("Entering mutate(context={})", context);
+
         MutagenException runtimeException = null;
         // Perform the mutation
         boolean success = true;
         long startTime = System.currentTimeMillis();
         try {
+            log.trace("Entering performMutation(context={})", context);
             performMutation(context);
+            log.trace("Leaving performMutation()");
+
         } catch (MutagenException e) {
             success = false;
             runtimeException = e;
@@ -175,6 +186,8 @@ public abstract class AbstractCassandraMutation implements Mutation<String> {
 
         if (runtimeException != null)
             throw runtimeException;
+
+        log.trace("Leaving mutate()");
 
     }
 

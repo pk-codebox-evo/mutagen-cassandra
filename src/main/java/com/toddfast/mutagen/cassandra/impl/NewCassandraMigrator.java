@@ -20,6 +20,8 @@ import com.datastax.driver.core.PreparedStatement;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Session;
 import com.toddfast.mutagen.cassandra.AbstractCassandraMutation;
+import com.toddfast.mutagen.cassandra.util.logging.Log;
+import com.toddfast.mutagen.cassandra.util.logging.LogFactory;
 
 /**
  * Base classe for cassandra migration tool.
@@ -28,6 +30,8 @@ import com.toddfast.mutagen.cassandra.AbstractCassandraMutation;
  * 
  */
 public abstract class NewCassandraMigrator extends AbstractCassandraMutation {
+
+    private static Log log = LogFactory.getLog(NewCassandraMigrator.class);
 
     public static final String KEYSPACE_APISPARK = "apispark";
 
@@ -60,6 +64,7 @@ public abstract class NewCassandraMigrator extends AbstractCassandraMutation {
      *            The program arguments
      */
     public void run(String[] args) {
+        log.debug("Starting manual execution of {}", getResourceName());
         initialize(KEYSPACE_APISPARK, args);
         executeManual();
     }
@@ -90,15 +95,16 @@ public abstract class NewCassandraMigrator extends AbstractCassandraMutation {
     }
 
     public final void executeManual() {
-
+        log.debug("Setting scriptOnlySession");
         setScriptOnlySession(Launcher.launchConnection());
 
+        log.info("Calling performMutation()");
         try {
             // mutate
             // context should only be used for logging
             performMutation(new CassandraContext(null, null));
         } finally {
-
+            log.debug("Closing session");
             getSession().close();
 
         }
@@ -268,31 +274,41 @@ public abstract class NewCassandraMigrator extends AbstractCassandraMutation {
 
     @Override
     public String getChecksum() {
+        log.trace("Entering getChecksum()");
         try {
-            String ret = toHex(getDigestFromArray(getClassContents(this.getClass())));
-            return ret;
+            String checksum = toHex(getDigestFromArray(getClassContents(this.getClass())));
+            
+            log.trace("Leaving getChecksum() : {}", checksum);
+            return checksum;
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException("unable to get checksum");
         }
+
     }
 
     public Session getSession() {
         if (manualRun) {
+            log.trace("Executing getSession() : {}, session is scriptOnly");
             return scriptOnlySession;
         }
         else
         {
+            log.trace("Executing getSession() : {}");
             return super.getSession();
         }
     }
 
     public void setScriptOnlySession(Session scriptOnlySession) {
+        log.trace("Calling setScriptOnlySession(session={})", scriptOnlySession);
         this.scriptOnlySession = scriptOnlySession;
         this.manualRun = true;
     }
 
     public static final byte[] getClassContents(Class<?> myClass) throws IOException {
+
+        log.trace("Entering getClassContents(class={})", myClass);
+
         String path = myClass.getName().replace('.', '/');
         String fileName = new StringBuffer(path).append(".java").toString();
         InputStream is = myClass.getClassLoader().getResourceAsStream(fileName);
@@ -304,6 +320,7 @@ public abstract class NewCassandraMigrator extends AbstractCassandraMutation {
         }
 
         is.close();
+        log.trace("Leaving getClassContents()");
 
         return buffer.toByteArray();
     }

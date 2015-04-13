@@ -8,10 +8,16 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.toddfast.mutagen.basic.ResourceScanner;
 import com.toddfast.mutagen.cassandra.CassandraMutagen;
 
 public class LoadResources {
+
+    private static Logger log = LoggerFactory.getLogger(LoadResources.class);
+
     /**
      * Sorts by root file name, ignoring path and file extension
      * 
@@ -102,7 +108,7 @@ public class LoadResources {
             // Clean the resources
 
             for (String resource : discoveredResources) {
-                System.out.println("Found mutation resource \"" + resource + "\"");
+                log.info("Found mutation resource \"{}\"", resource);
 
                 if (resource.endsWith(".class")) {
                     // Remove the file path

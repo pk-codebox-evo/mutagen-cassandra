@@ -22,29 +22,40 @@ public class ConsoleLog implements Log {
         this.level = level;
     }
 
-    public void debug(String message) {
-        if (level == Level.DEBUG) {
-            System.out.println("DEBUG: " + message);
-        }
+    @Override
+    public void debug(String message, Object... objects) {
+        System.out.println("DEBUG: " + message);
+
     }
 
-    public void info(String message) {
-        if (level.compareTo(Level.INFO) <= 0) {
-            System.out.println(message);
-        }
+    @Override
+    public void info(String message, Object... objects) {
+        System.out.println("INFO: " + message);
+
     }
 
-    public void warn(String message) {
-        System.out.println("WARNING: " + message);
-    }
-
-    public void error(String message) {
+    @Override
+    public void warn(String message, Object... objects) {
         System.out.println("ERROR: " + message);
+
     }
+
+    @Override
+    public void error(String message, Object... objects) {
+        System.out.println("ERROR: " + message);
+
+    }
+
 
     public void error(String message, Exception e) {
         System.out.println("ERROR: " + message);
         e.printStackTrace();
     }
+
+    @Override
+    public void trace(String message, Object... objects) {
+        System.out.print("TRACE: " + message);
+    }
+
 
 }

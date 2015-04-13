@@ -19,7 +19,7 @@ import com.toddfast.mutagen.cassandra.CassandraMutagen;
 public class Launcher {
 
     // Look for mutation scripts in the following folder
-    private static final String RESOURCE_PATH = "com/toddfast/mutagen/cassandra/mutations";
+    private static final String RESOURCE_PATH = "mutations";
 
     public static void main(String[] args) throws IOException {
 
@@ -40,6 +40,8 @@ public class Launcher {
         // Perform mutations and print result
         printMutationResult(mutagen.mutate());
 
+
+        System.out.println();
         // close session and cluster
         if (session != null) {
             session.close();

@@ -7,6 +7,7 @@ import java.util.Properties;
 import com.datastax.driver.core.Session;
 import com.toddfast.mutagen.MutagenException;
 import com.toddfast.mutagen.Plan;
+import com.toddfast.mutagen.Plan.Result;
 import com.toddfast.mutagen.Planner;
 import com.toddfast.mutagen.cassandra.CassandraCoordinator;
 import com.toddfast.mutagen.cassandra.CassandraMutagen;
@@ -16,6 +17,8 @@ import com.toddfast.mutagen.cassandra.impl.info.MigrationInfoService;
 import com.toddfast.mutagen.cassandra.impl.info.MigrationInfoServiceImpl;
 import com.toddfast.mutagen.cassandra.util.DBUtils;
 import com.toddfast.mutagen.cassandra.util.LoadResources;
+import com.toddfast.mutagen.cassandra.util.logging.Log;
+import com.toddfast.mutagen.cassandra.util.logging.LogFactory;
 
 /**
  * An implementation for cassandraMutagen.
@@ -24,6 +27,8 @@ import com.toddfast.mutagen.cassandra.util.LoadResources;
  */
 public class CassandraMutagenImpl implements CassandraMutagen {
     private Session session;
+
+    private static Log log = LogFactory.getLog(CassandraMutagenImpl.class);
 
     private List<String> resources;
 
@@ -41,7 +46,9 @@ public class CassandraMutagenImpl implements CassandraMutagen {
     @Override
     public void initialize(String rootResourcePath)
             throws IOException {
+        log.debug("Initialising with resourcePath {}", rootResourcePath);
         resources = LoadResources.loadResources(this, rootResourcePath);
+
     }
 
     /**
@@ -88,6 +95,7 @@ public class CassandraMutagenImpl implements CassandraMutagen {
      * @return mutations plan
      */
     public Plan<String> getMutationsPlan() {
+        log.trace("Entering getMutationsPlan(session={})", session);
         CassandraCoordinator coordinator = new CassandraCoordinator(session);
         CassandraSubject subject = new CassandraSubject(session);
 
@@ -95,6 +103,7 @@ public class CassandraMutagenImpl implements CassandraMutagen {
                 new CassandraPlanner(session, getResources());
         Plan<String> plan = planner.getPlan(subject, coordinator);
 
+        log.trace("Leaving getMutationsPlan() : {}", plan);
         return plan;
     }
 
@@ -106,12 +115,20 @@ public class CassandraMutagenImpl implements CassandraMutagen {
      */
     @Override
     public Plan.Result<String> mutate() {
+        log.trace("Entering mutate(session={})", session);
+        Result<String> mutationsResult;
+
+
         // Do this in a VM-wide critical section. External cluster-wide
         // synchronization is going to have to happen in the coordinator.
-
         synchronized (System.class) {
-            return getMutationsPlan().execute();
+
+            mutationsResult = getMutationsPlan().execute();
         }
+
+        log.trace("Leaving mutate()", mutationsResult);
+        return mutationsResult;
+
     }
 
     /**
@@ -125,6 +142,7 @@ public class CassandraMutagenImpl implements CassandraMutagen {
         DBUtils.dropSchemaVersionTable(session);
 
         System.out.println("Done");
+
 
     }
 
@@ -152,7 +170,7 @@ public class CassandraMutagenImpl implements CassandraMutagen {
         synchronized (System.class) {
             new BaseLine(this, session, baselineVersion).baseLine();
         }
-        System.out.println("Done");
+        System.out.println("Done with baseline");
 
     }
 

@@ -10,15 +10,23 @@ public interface Log {
      * @param message
      *            The message to log.
      */
-    void debug(String message);
+    void debug(String message, Object... objects);
 
     /**
-     * Logs an info message.
-     *
+     * Logs a debug message.
+     * 
      * @param message
      *            The message to log.
      */
-    void info(String message);
+    void trace(String message, Object... objects);
+
+    /**
+     * Logs an info message.
+     * 
+     * @param message
+     *            The message to log.
+     */
+    void info(String message, Object... objects);
 
     /**
      * Logs a warning message.
@@ -26,7 +34,7 @@ public interface Log {
      * @param message
      *            The message to log.
      */
-    void warn(String message);
+    void warn(String message, Object... objects);
 
     /**
      * Logs an error message.
@@ -34,7 +42,7 @@ public interface Log {
      * @param message
      *            The message to log.
      */
-    void error(String message);
+    void error(String message, Object... objects);
 
     /**
      * Logs an error message and the exception that caused it.
