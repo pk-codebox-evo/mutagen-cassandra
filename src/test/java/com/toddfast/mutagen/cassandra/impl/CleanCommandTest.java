@@ -15,16 +15,16 @@ public class CleanCommandTest extends AbstractTest {
     public void checkVersionTableDropped() throws IOException {
         
         // Instanciate mutagen
-        CassandraMutagen mutagen = new CassandraMutagenImpl();
+        CassandraMutagen mutagen = new CassandraMutagenImpl(getSession());
 
         // Use working case for test
         mutagen.initialize("mutations/tests/execution");
 
         // mutate
-        mutagen.mutate(getSession());
+        mutagen.mutate();
 
         // Clean
-        mutagen.clean(getSession());
+        mutagen.clean();
 
         // Try select on version table. Should fail since table dropped
         try {

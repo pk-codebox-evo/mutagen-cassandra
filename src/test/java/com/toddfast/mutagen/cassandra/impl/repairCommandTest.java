@@ -33,11 +33,11 @@ public class repairCommandTest extends AbstractTest {
 
 
         // Instanciate new mutagen object
-        CassandraMutagen mutagen = new CassandraMutagenImpl();
+        CassandraMutagen mutagen = new CassandraMutagenImpl(getSession());
         mutagen.initialize(resourcePath);
 
         // Repair
-        mutagen.repair(getSession());
+        mutagen.repair();
 
         // make sure there's no failure in the database
         rs = getSession().execute("SELECT success FROM \"Version\"");

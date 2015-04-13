@@ -245,7 +245,6 @@ public class CassandraPlanner extends BasicPlanner<String> {
             if (DBUtils.isMutationFailed(session, targetState.getID()))
                     throw new MutagenException("There is a failed mutation in database for script : " + mutation.toString());
         }
-
         return new BasicPlan(subject, coordinator, subjectMutations);
     }
 }

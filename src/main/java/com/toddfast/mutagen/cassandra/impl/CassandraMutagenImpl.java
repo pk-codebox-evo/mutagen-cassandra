@@ -2,6 +2,7 @@ package com.toddfast.mutagen.cassandra.impl;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Properties;
 
 import com.datastax.driver.core.Session;
 import com.toddfast.mutagen.MutagenException;
@@ -22,9 +23,17 @@ import com.toddfast.mutagen.cassandra.util.LoadResources;
  * It is the enter point of application.
  */
 public class CassandraMutagenImpl implements CassandraMutagen {
+    private Session session;
 
     private List<String> resources;
 
+    private String baselineVersion = "000000000000";
+
+    private MigrationInfoService migrationInfoService;
+
+    public CassandraMutagenImpl(Session session) {
+        this.session = session;
+    }
     /**
      * Loads the resources.
      * 
@@ -32,7 +41,7 @@ public class CassandraMutagenImpl implements CassandraMutagen {
     @Override
     public void initialize(String rootResourcePath)
             throws IOException {
-        resources = LoadResources.loadResources(rootResourcePath, this);
+        resources = LoadResources.loadResources(this, rootResourcePath);
     }
 
     /**
@@ -45,11 +54,40 @@ public class CassandraMutagenImpl implements CassandraMutagen {
     }
 
     /**
+     * getter for baseline.
+     * 
+     * @return baseline version.
+     */
+    public String getBaselineVersion() {
+        return baselineVersion;
+    }
+
+    /**
+     * setter for baseline.
+     * 
+     * @param baselineVersion
+     *            - baseline version.
+     */
+    public void setBaselineVersion(String baselineVersion) {
+        this.baselineVersion = baselineVersion;
+    }
+
+    /**
+     * Configure the properties of migration.
+     */
+    @Override
+    public void configure(Properties properties) {
+        String baselineVersion = properties.getProperty("baselineVersion");
+        if (baselineVersion != null) {
+            setBaselineVersion(baselineVersion);
+        }
+    }
+    /**
      * Retrive a plan of mutations.
      * 
      * @return mutations plan
      */
-    public Plan<String> getMutationsPlan(Session session) {
+    public Plan<String> getMutationsPlan() {
         CassandraCoordinator coordinator = new CassandraCoordinator(session);
         CassandraSubject subject = new CassandraSubject(session);
 
@@ -67,12 +105,12 @@ public class CassandraMutagenImpl implements CassandraMutagen {
      *         the results of migration.
      */
     @Override
-    public Plan.Result<String> mutate(Session session) {
+    public Plan.Result<String> mutate() {
         // Do this in a VM-wide critical section. External cluster-wide
         // synchronization is going to have to happen in the coordinator.
 
         synchronized (System.class) {
-            return getMutationsPlan(session).execute();
+            return getMutationsPlan().execute();
         }
     }
 
@@ -80,10 +118,12 @@ public class CassandraMutagenImpl implements CassandraMutagen {
      * Drop version table.
      */
     @Override
-    public void clean(Session session) {
+    public void clean() {
         System.out.println("Cleaning...");
+
         // TRUNCATE instead of drop ?
         DBUtils.dropSchemaVersionTable(session);
+
         System.out.println("Done");
 
     }
@@ -92,9 +132,11 @@ public class CassandraMutagenImpl implements CassandraMutagen {
      * delete the failed records in the version table.
      */
     @Override
-    public void repair(Session session) {
+    public void repair() {
         System.out.println("Repairing...");
+
         DBUtils.deleteFailedVersionRecord(session);
+
         System.out.println("Done");
 
     }
@@ -103,12 +145,12 @@ public class CassandraMutagenImpl implements CassandraMutagen {
      * baseline
      */
     @Override
-    public void baseline(Session session, String lastCompletedState) throws MutagenException {
+    public void baseline() throws MutagenException {
 
         System.out.println("Baseline...");
 
         synchronized (System.class) {
-            new BaseLine(this, session, lastCompletedState).baseLine();
+            new BaseLine(this, session, baselineVersion).baseLine();
         }
         System.out.println("Done");
 
@@ -121,8 +163,11 @@ public class CassandraMutagenImpl implements CassandraMutagen {
      *            - the session to execute the cql.
      * @return instance of MigrationInfoService.
      */
-    public MigrationInfoService info(Session session) {
-        return new MigrationInfoServiceImpl(session);
+    public MigrationInfoService info() {
+        if (migrationInfoService == null)
+            return new MigrationInfoServiceImpl(session);
+        else
+            return migrationInfoService;
     }
 
 }

@@ -50,7 +50,7 @@ public abstract class AbstractTest {
     protected void mutate(String path) {
 
         // Get an instance of CassandraMutagen
-        CassandraMutagen mutagen = new CassandraMutagenImpl();
+        CassandraMutagen mutagen = new CassandraMutagenImpl(session);
         // Initialize the list of mutations
         try {
             mutagen.initialize(path);
@@ -58,7 +58,7 @@ public abstract class AbstractTest {
             throw new RuntimeException(e);
         }
         // Mutate!
-        result = mutagen.mutate(session);
+        result = mutagen.mutate();
     }
 
     /**

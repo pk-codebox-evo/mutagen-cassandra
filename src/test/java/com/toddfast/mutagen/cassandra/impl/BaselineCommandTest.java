@@ -6,8 +6,6 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import com.toddfast.mutagen.cassandra.CassandraMutagen;
-
 public class BaselineCommandTest extends AbstractTest {
 
     final String desiredLastState = "201502011225";
@@ -18,12 +16,13 @@ public class BaselineCommandTest extends AbstractTest {
     public void checkForLastStateAndChecksums() throws IOException {
 
         // Instanciate mutagen
-        CassandraMutagen mutagen = new CassandraMutagenImpl();
+        CassandraMutagenImpl mutagen = new CassandraMutagenImpl(getSession());
+        mutagen.setBaselineVersion(desiredLastState);
         mutagen.initialize(resourcePath);
 
         // set baseline for third of four scripts
         // first three scripts contains error, to check for unexpected execution
-        mutagen.baseline(getSession(), desiredLastState);
+        mutagen.baseline();
         
         Assert.assertEquals(desiredLastState, queryDatabaseForLastState());
         

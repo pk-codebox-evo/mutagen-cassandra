@@ -26,7 +26,7 @@ public class Launcher {
         Session session = launchConnection();
 
         // initialisation with resourcePath, necessary for mutate and baseline
-        CassandraMutagen mutagen = initialiseMutagen(RESOURCE_PATH);
+        CassandraMutagen mutagen = initialiseMutagen(session, RESOURCE_PATH);
 
         // Clean
         // mutagen.clean(session);
@@ -38,7 +38,7 @@ public class Launcher {
         // mutagen.baseline(session, RESOURCE_PATH, "201502011225");
 
         // Perform mutations and print result
-        printMutationResult(mutagen.mutate(session));
+        printMutationResult(mutagen.mutate());
 
         // close session and cluster
         if (session != null) {
@@ -54,8 +54,8 @@ public class Launcher {
      */
     public static Result<String> performMutations(Session session, String resourcePath) throws IOException {
 
-        CassandraMutagen mutagen = initialiseMutagen(resourcePath);
-        Result<String> result = mutagen.mutate(session);
+        CassandraMutagen mutagen = initialiseMutagen(session, resourcePath);
+        Result<String> result = mutagen.mutate();
 
         // print summary
         printMutationResult(result);
@@ -63,8 +63,8 @@ public class Launcher {
         return result;
     }
 
-    public static CassandraMutagen initialiseMutagen(String resourcePath) throws IOException {
-        CassandraMutagen mutagen = new CassandraMutagenImpl();
+    public static CassandraMutagen initialiseMutagen(Session session, String resourcePath) throws IOException {
+        CassandraMutagen mutagen = new CassandraMutagenImpl(session);
         mutagen.initialize(resourcePath);
         return mutagen;
     }

@@ -82,7 +82,6 @@ public class BasicPlanner<I extends Comparable<I>> implements Planner<I> {
      * @return mutations result.
      */
     private BasicResult executePlan(BasicPlan plan) {
-
         List<Mutation<I>> completedMutations = new ArrayList<Mutation<I>>();
         List<Mutation<I>> remainingMutations =
                 new ArrayList<Mutation<I>>(plan.getMutations());
@@ -99,7 +98,6 @@ public class BasicPlanner<I extends Comparable<I>> implements Planner<I> {
 
             try {
                 mutation.mutate(context);
-
                 lastState = mutation.getResultingState();
 
                 // Add to the completed list, remove from remaining list

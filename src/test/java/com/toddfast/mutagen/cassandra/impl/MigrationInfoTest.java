@@ -11,36 +11,36 @@ import com.toddfast.mutagen.cassandra.impl.info.MigrationInfoService;
 public class MigrationInfoTest extends AbstractTest {
     @Test
     public void noMigrationInfoTest() {
-        CassandraMutagen mutagen = new CassandraMutagenImpl();
-        MigrationInfoService migrationService = mutagen.info(AbstractTest.getSession());
+        CassandraMutagen mutagen = new CassandraMutagenImpl(getSession());
+        MigrationInfoService migrationService = mutagen.info();
         migrationService.refresh();
         Assert.assertEquals("no migrations found", migrationService.toString());
     }
 
     @Test
     public void migrationInfoWithFailedScriptTest() {
-        CassandraMutagen mutagen = new CassandraMutagenImpl();
-        MigrationInfoService migrationService = mutagen.info(AbstractTest.getSession());
+        CassandraMutagen mutagen = new CassandraMutagenImpl(getSession());
+        MigrationInfoService migrationService = mutagen.info();
         try {
             mutagen.initialize("mutations/tests/failed_mutation");
         } catch (IOException e) {
 
         }
-        mutagen.mutate(AbstractTest.getSession());
+        mutagen.mutate();
         migrationService.refresh();
         Assert.assertEquals(migrationService.current().getFilename(), "M201507010001_WrongCqlScriptFile_1111.cqlsh.txt");
     }
 
     @Test
     public void migrationInfoWithNoFailedScriptTest() {
-        CassandraMutagen mutagen = new CassandraMutagenImpl();
-        MigrationInfoService migrationService = mutagen.info(AbstractTest.getSession());
+        CassandraMutagen mutagen = new CassandraMutagenImpl(getSession());
+        MigrationInfoService migrationService = mutagen.info();
         try {
             mutagen.initialize("mutations/tests/execution");
         } catch (IOException e) {
 
         }
-        mutagen.mutate(AbstractTest.getSession());
+        mutagen.mutate();
         migrationService.refresh();
 
         Assert.assertEquals(migrationService.failed(), null);

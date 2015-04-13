@@ -1,14 +1,15 @@
-package com.toddfast.mutagen.cassandra.mutations;
+package mutations;
+
 
 import com.toddfast.mutagen.MutagenException;
 import com.toddfast.mutagen.cassandra.impl.NewCassandraMigrator;
 
 /**
- * 
- * It is a script file java.
- * It is just for test.
+ *
+ * It is a script file java that update table Test1.
  */
 public class M201502011225_UpdateTableTest_1111 extends NewCassandraMigrator {
+
 
 
     @Override
@@ -24,7 +25,5 @@ public class M201502011225_UpdateTableTest_1111 extends NewCassandraMigrator {
         }
     }
 
-    public static void main(String[] args) {
-        new M201502011225_UpdateTableTest_1111().run(args);
-    }
+
 }

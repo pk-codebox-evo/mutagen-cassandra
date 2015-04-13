@@ -1,8 +1,8 @@
 package com.toddfast.mutagen.cassandra;
 
 import java.io.IOException;
+import java.util.Properties;
 
-import com.datastax.driver.core.Session;
 import com.toddfast.mutagen.Plan;
 import com.toddfast.mutagen.cassandra.impl.info.MigrationInfoService;
 
@@ -11,6 +11,14 @@ import com.toddfast.mutagen.cassandra.impl.info.MigrationInfoService;
  * The application should implement this interface to finish automatic migration.
  */
 public interface CassandraMutagen {
+    /**
+     * Configures cassandra mutagen with these properties.
+     * It can overwrite any existing configuration.
+     * 
+     * @param properties
+     *            - properties.
+     */
+    public void configure(Properties properties);
 
     /**
      * 
@@ -23,42 +31,32 @@ public interface CassandraMutagen {
             throws IOException;
 
     /**
-     * @param session
-     *            the session to execute cql statements, just one instance in the application.
      * @return
      *         the result of migration of all the scripts.
      */
-    public Plan.Result<String> mutate(Session session);
+    public Plan.Result<String> mutate();
 
     /**
-     * @param session
-     *            the session to execute cql statements, just one instance in the application.
-     * 
+     *  
      */
-    public void baseline(Session session, String lastCompletedState);
+    public void baseline();
 
     /**
-     * @param session
-     *            the session to execute cql statements, just one instance in the application.
      * 
      */
-    public void clean(Session session);
+    public void clean();
 
     /**
-     * @param session
-     *            the session to execute cql statements, just one instance in the application.
      * 
      */
-    public void repair(Session session);
+    public void repair();
 
     /**
      * Retrive the complete information about all the migrations.
      * 
-     * @param session
-     *            - the session to execute cql.
      * @return instance of MigrationInfoService.
      * 
      */
-    public MigrationInfoService info(Session session);
+    public MigrationInfoService info();
 
 }

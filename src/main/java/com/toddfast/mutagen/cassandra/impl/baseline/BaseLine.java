@@ -34,7 +34,7 @@ public class BaseLine {
     // Dummy execution of all mutations with state inferior of equal to lastCompletedState
     private void dummyPlanExecution() {
 
-        for (Mutation<String> m : mutagen.getMutationsPlan(session).getMutations()) {
+        for (Mutation<String> m : mutagen.getMutationsPlan().getMutations()) {
 
             if (m.getResultingState().getID().compareTo(lastCompletedState) <= 0)
                 try {

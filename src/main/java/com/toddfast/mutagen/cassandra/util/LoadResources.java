@@ -83,7 +83,7 @@ public class LoadResources {
      * @return List of resources founded.
      * @throws IOException
      */
-    public static List<String> loadResources(String rootResourcePath, CassandraMutagen mutagen) throws IOException {
+    public static List<String> loadResources(CassandraMutagen mutagen, String rootResourcePath) throws IOException {
         List<String> resources = new ArrayList<String>();
         try {
             List<String> discoveredResources =
