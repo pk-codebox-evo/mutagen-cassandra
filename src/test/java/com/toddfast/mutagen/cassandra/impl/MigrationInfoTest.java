@@ -19,10 +19,11 @@ public class MigrationInfoTest extends AbstractTest {
 
     @Test
     public void migrationInfoWithFailedScriptTest() {
-        CassandraMutagen mutagen = new CassandraMutagenImpl(getSession());
+        CassandraMutagenImpl mutagen = new CassandraMutagenImpl(getSession());
         MigrationInfoService migrationService = mutagen.info();
         try {
-            mutagen.initialize("mutations/tests/failed_mutation");
+            mutagen.setLocation("mutations/tests/failed_mutation");
+            mutagen.initialize();
         } catch (IOException e) {
 
         }
@@ -33,10 +34,11 @@ public class MigrationInfoTest extends AbstractTest {
 
     @Test
     public void migrationInfoWithNoFailedScriptTest() {
-        CassandraMutagen mutagen = new CassandraMutagenImpl(getSession());
+        CassandraMutagenImpl mutagen = new CassandraMutagenImpl(getSession());
         MigrationInfoService migrationService = mutagen.info();
         try {
-            mutagen.initialize("mutations/tests/execution");
+            mutagen.setLocation("mutations/tests/execution");
+            mutagen.initialize();
         } catch (IOException e) {
 
         }

@@ -96,7 +96,6 @@ public class LoadResources {
                     ResourceScanner.getInstance().getResources(
                             rootResourcePath, Pattern.compile(".*"),
                             mutagen.getClass().getClassLoader());
-
             // Make sure we found some resources
             if (discoveredResources.isEmpty()) {
                 throw new IllegalArgumentException("Could not find resources " +

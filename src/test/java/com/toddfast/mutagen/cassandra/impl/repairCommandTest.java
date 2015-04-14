@@ -7,7 +7,6 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import com.datastax.driver.core.ResultSet;
-import com.toddfast.mutagen.cassandra.CassandraMutagen;
 
 public class repairCommandTest extends AbstractTest {
 
@@ -33,8 +32,9 @@ public class repairCommandTest extends AbstractTest {
 
 
         // Instanciate new mutagen object
-        CassandraMutagen mutagen = new CassandraMutagenImpl(getSession());
-        mutagen.initialize(resourcePath);
+        CassandraMutagenImpl mutagen = new CassandraMutagenImpl(getSession());
+        mutagen.setLocation(resourcePath);
+        mutagen.initialize();
 
         // Repair
         mutagen.repair();

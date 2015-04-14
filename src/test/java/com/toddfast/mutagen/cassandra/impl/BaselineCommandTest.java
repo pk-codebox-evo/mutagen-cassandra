@@ -18,7 +18,8 @@ public class BaselineCommandTest extends AbstractTest {
         // Instanciate mutagen
         CassandraMutagenImpl mutagen = new CassandraMutagenImpl(getSession());
         mutagen.setBaselineVersion(desiredLastState);
-        mutagen.initialize(resourcePath);
+        mutagen.setLocation(resourcePath);
+        mutagen.initialize();
 
         // set baseline for third of four scripts
         // first three scripts contains error, to check for unexpected execution

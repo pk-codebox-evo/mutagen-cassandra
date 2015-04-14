@@ -15,7 +15,6 @@ import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.toddfast.mutagen.Plan;
-import com.toddfast.mutagen.cassandra.CassandraMutagen;
 import com.toddfast.mutagen.cassandra.util.DBUtils;
 
 /**
@@ -50,10 +49,11 @@ public abstract class AbstractTest {
     protected void mutate(String path) {
 
         // Get an instance of CassandraMutagen
-        CassandraMutagen mutagen = new CassandraMutagenImpl(session);
+        CassandraMutagenImpl mutagen = new CassandraMutagenImpl(session);
         // Initialize the list of mutations
         try {
-            mutagen.initialize(path);
+            mutagen.setLocation(path);
+            mutagen.initialize();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

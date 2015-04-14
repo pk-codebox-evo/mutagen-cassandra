@@ -34,6 +34,8 @@ public class CassandraMutagenImpl implements CassandraMutagen {
 
     private String baselineVersion = "000000000000";
 
+    private String location = "mutations";
+
     private MigrationInfoService migrationInfoService;
 
     public CassandraMutagenImpl(Session session) {
@@ -43,11 +45,10 @@ public class CassandraMutagenImpl implements CassandraMutagen {
      * Loads the resources.
      * 
      */
-    @Override
-    public void initialize(String rootResourcePath)
+    public void initialize()
             throws IOException {
-        log.debug("Initialising with resourcePath {}", rootResourcePath);
-        resources = LoadResources.loadResources(this, rootResourcePath);
+        log.debug("Initialising with resourcePath {}" + location, location);
+        resources = LoadResources.loadResources(this, location);
 
     }
 
@@ -80,14 +81,40 @@ public class CassandraMutagenImpl implements CassandraMutagen {
     }
 
     /**
+     * getter for location.
+     * 
+     * @return location.
+     */
+    public String getLocation() {
+        return location;
+    }
+
+    /**
+     * setter for location.
+     * 
+     * @param location
+     *            - location.
+     */
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    /**
      * Configure the properties of migration.
      */
     @Override
     public void configure(Properties properties) {
         String baselineVersion = properties.getProperty("baselineVersion");
+
         if (baselineVersion != null) {
             setBaselineVersion(baselineVersion);
         }
+
+        String location = properties.getProperty("location");
+        if (location != null) {
+            setLocation(location);
+        }
+
     }
     /**
      * Retrive a plan of mutations.
@@ -187,5 +214,4 @@ public class CassandraMutagenImpl implements CassandraMutagen {
         else
             return migrationInfoService;
     }
-
 }

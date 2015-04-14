@@ -36,9 +36,9 @@ public class Main {
             overrideConfiguration(properties, args);
 
             Session session = createSession(properties);
-            CassandraMutagen mutagen = new CassandraMutagenImpl(session);
+            CassandraMutagenImpl mutagen = new CassandraMutagenImpl(session);
             mutagen.configure(properties);
-            mutagen.initialize("mutations");
+            mutagen.initialize();
 
             for (String operation : operations) {
                 executeOperation(mutagen, operation);
@@ -93,7 +93,7 @@ public class Main {
             LOG.info("migration is finished.");
         else {
             LOG.info(result.getCompletedMutations().size() + " migrations are finished!");
-            LOG.info(result.getRemainingMutations().size() + "migration are not finished!");
+            LOG.info(result.getRemainingMutations().size() + " migration are not finished!");
         }
     }
 

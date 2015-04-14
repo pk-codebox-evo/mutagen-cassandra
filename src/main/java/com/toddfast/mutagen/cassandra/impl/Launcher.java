@@ -66,8 +66,9 @@ public class Launcher {
     }
 
     public static CassandraMutagen initialiseMutagen(Session session, String resourcePath) throws IOException {
-        CassandraMutagen mutagen = new CassandraMutagenImpl(session);
-        mutagen.initialize(resourcePath);
+        CassandraMutagenImpl mutagen = new CassandraMutagenImpl(session);
+        mutagen.setLocation(resourcePath);
+        mutagen.initialize();
         return mutagen;
     }
 

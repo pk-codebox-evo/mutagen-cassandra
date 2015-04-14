@@ -27,7 +27,7 @@ public interface CassandraMutagen {
      * @throws IOException
      *             IO Exception
      */
-    public void initialize(String rootResourcePath)
+    public void initialize()
             throws IOException;
 
     /**

@@ -54,7 +54,7 @@ public class ConsoleLog implements Log {
 
     @Override
     public void trace(String message, Object... objects) {
-        System.out.print("TRACE: " + message);
+        System.out.println("TRACE: " + message);
     }
 
 
