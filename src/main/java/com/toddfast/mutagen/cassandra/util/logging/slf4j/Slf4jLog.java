@@ -28,7 +28,6 @@ public class Slf4jLog implements Log {
     @Override
     public void debug(String message, Object... objects) {
         logger.debug(message, objects);
-
     }
 
     @Override

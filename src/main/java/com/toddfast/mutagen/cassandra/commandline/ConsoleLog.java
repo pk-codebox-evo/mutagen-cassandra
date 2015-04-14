@@ -24,38 +24,43 @@ public class ConsoleLog implements Log {
 
     @Override
     public void debug(String message, Object... objects) {
-        System.out.println("DEBUG: " + message);
+        System.out.println("DEBUG: " + replacedMessage(message, objects));
 
     }
 
     @Override
     public void info(String message, Object... objects) {
-        System.out.println("INFO: " + message);
+        System.out.println("INFO: " + replacedMessage(message, objects));
 
     }
 
     @Override
     public void warn(String message, Object... objects) {
-        System.out.println("ERROR: " + message);
+        System.out.println("ERROR: " + replacedMessage(message, objects));
 
     }
 
     @Override
     public void error(String message, Object... objects) {
-        System.out.println("ERROR: " + message);
+        System.out.println("ERROR: " + replacedMessage(message, objects));
 
     }
 
 
     public void error(String message, Exception e) {
-        System.out.println("ERROR: " + message);
-        e.printStackTrace();
+        System.out.println("ERROR: " + replacedMessage(message, e));
     }
 
     @Override
     public void trace(String message, Object... objects) {
-        System.out.println("TRACE: " + message);
+        System.out.println("TRACE: " + replacedMessage(message, objects));
     }
 
-
+    private String replacedMessage(String message, Object... objects) {
+        String localMessage = message;
+        for (Object object : objects) {
+            localMessage = localMessage.replaceFirst("\\{\\}", "{ " + object.toString() + " }");
+        }
+        return localMessage;
+    }
 }

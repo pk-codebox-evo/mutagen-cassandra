@@ -47,7 +47,7 @@ public class CassandraMutagenImpl implements CassandraMutagen {
      */
     public void initialize()
             throws IOException {
-        log.debug("Initialising with resourcePath {}" + location, location);
+        log.debug("Initialising with resourcePath {}", location);
         resources = LoadResources.loadResources(this, location);
 
     }
