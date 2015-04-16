@@ -13,8 +13,6 @@ import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.toddfast.mutagen.MutagenException;
-import com.toddfast.mutagen.State;
-import com.toddfast.mutagen.basic.SimpleState;
 
 public class DBUtils {
     private static Logger log = LoggerFactory.getLogger(DBUtils.class);
@@ -58,7 +56,7 @@ public class DBUtils {
                 "Version" +
                 "\"( versionid varchar, filename varchar,checksum varchar,"
                 + "execution_date timestamp,execution_time int,"
-                + "success boolean, PRIMARY KEY(versionid))";
+                + "status varchar, PRIMARY KEY(versionid))";
 
         session.execute(createStatement);
         log.trace("Leaving createSchemaVersionTable()");
@@ -125,15 +123,15 @@ public class DBUtils {
      */
     public static void appendVersionRecord(Session session, String version, String filename, String checksum,
             int execution_time,
-            boolean success) {
+            String status) {
 
         log.trace(
                 "Entering appendVersionRecord(session={}, version={}, filename={}, checksum={}, execution_time={}, success={})",
-                session, version, filename, checksum, execution_time, success);
+                session, version, filename, checksum, execution_time, status);
 
         // insert statement for version record
         String insertStatement = "INSERT INTO \"" + "Version" + "\" (versionid,filename,checksum,"
-                + "execution_date,execution_time,success) "
+                + "execution_date,execution_time,status) "
                 + "VALUES (?,?,?,?,?,?);";
         // prepare statement
         PreparedStatement preparedInsertStatement = session.prepare(insertStatement);
@@ -142,7 +140,7 @@ public class DBUtils {
                 checksum,
                 new Timestamp(new Date().getTime()),
                 execution_time,
-                success
+                status
                 ));
 
         log.trace("Leaving appendVersionRecord()");
@@ -191,7 +189,7 @@ public class DBUtils {
 
         while (!rs.isExhausted()) {
             Row r = rs.one();
-            if (!r.getBool("success")) {
+            if (r.getString("status").equals("failed")) {
                 log.info("The following record has been selected for deletion : {}", r);
                 selectedRows.add(r);
             }
@@ -229,7 +227,7 @@ public class DBUtils {
         boolean hasFailed = false;
 
         // if there's one and only one row, and the mutation has failed
-        if (rows.size() == 1 && !rows.get(0).getBool("success"))
+        if (rows.size() == 1 && rows.get(0).getString("status").equals("failed"))
             hasFailed = true;
 
         log.trace("Executed isVersionIdPresent(session={}, versionId={}) : {}", session, versionId, hasFailed);
@@ -265,7 +263,7 @@ public class DBUtils {
      * @return
      *         the current timestamp in the database.
      */
-    public static State<String> getCurrentState(Session session) {
+    public static String getCurrentState(Session session) {
         log.trace("Entering getCurrentState(session={})", session);
 
         String version = "000000000000";
@@ -295,14 +293,12 @@ public class DBUtils {
             log.trace("Parsing row {}", r);
 
             String versionid = r.getString("versionid");
-            if (r.getBool("success") == true && version.compareTo(versionid) < 0)
+            if ((!r.getString("status").equals("failed")) && version.compareTo(versionid) < 0)
                 version = versionid;
         }
 
-        SimpleState<String> currentState = new SimpleState<String>(version);
+        log.trace("Leaving getCurrentState() : {}", version);
 
-        log.trace("Leaving getCurrentState() : {}", currentState);
-
-        return currentState;
+        return version;
     }
 }

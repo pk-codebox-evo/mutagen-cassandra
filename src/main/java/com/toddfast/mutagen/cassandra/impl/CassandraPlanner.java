@@ -9,6 +9,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.datastax.driver.core.Session;
 import com.toddfast.mutagen.Coordinator;
 import com.toddfast.mutagen.MutagenException;
@@ -18,8 +21,6 @@ import com.toddfast.mutagen.State;
 import com.toddfast.mutagen.Subject;
 import com.toddfast.mutagen.cassandra.AbstractCassandraMutation;
 import com.toddfast.mutagen.cassandra.util.DBUtils;
-import com.toddfast.mutagen.cassandra.util.logging.Log;
-import com.toddfast.mutagen.cassandra.util.logging.LogFactory;
 
 /**
  * Generates cassandra migration plans using the initial list of mutations and
@@ -27,7 +28,7 @@ import com.toddfast.mutagen.cassandra.util.logging.LogFactory;
  */
 public class CassandraPlanner extends BasicPlanner<String> {
 
-    private static Log log = LogFactory.getLog(CassandraPlanner.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(CassandraPlanner.class);
 
     private Session session;
 
@@ -59,7 +60,7 @@ public class CassandraPlanner extends BasicPlanner<String> {
     private static List<Mutation<String>> loadMutations(
             Session session, Collection<String> resources) {
 
-        log.trace("Entering loadMutations(session={}, resources={})", session, resources);
+        LOGGER.trace("Entering loadMutations(session={}, resources={})", session, resources);
 
         List<Mutation<String>> result = new ArrayList<Mutation<String>>();
 
@@ -88,7 +89,7 @@ public class CassandraPlanner extends BasicPlanner<String> {
 
         checkForDuplicateRessourceState(result);
 
-        log.trace("Leaving loadMutations() : {}", result);
+        LOGGER.trace("Leaving loadMutations() : {}", result);
 
         return result;
     }
@@ -101,7 +102,7 @@ public class CassandraPlanner extends BasicPlanner<String> {
      */
     private static void checkForDuplicateRessourceState(List<Mutation<String>> mutations) {
 
-        log.trace("checking for duplicate resource states");
+        LOGGER.trace("checking for duplicate resource states");
         // store all states as string
         List<String> states = new ArrayList<String>();
 
@@ -143,7 +144,7 @@ public class CassandraPlanner extends BasicPlanner<String> {
     private static Mutation<String> loadMutationClass(
             Session session, String resource) {
 
-        log.trace("Entering loadMutationClass(session={}, resource={})", session, resource);
+        LOGGER.trace("Entering loadMutationClass(session={}, resource={})", session, resource);
 
         assert resource.endsWith(".class") : "Class resource name \"" + resource + "\" should end with .class";
 
@@ -165,12 +166,12 @@ public class CassandraPlanner extends BasicPlanner<String> {
             Constructor<?> constructor;
             Mutation<String> mutation = null;
             try {
-                log.debug("Instanciating {}", clazz);
+                LOGGER.debug("Instanciating {}", clazz);
 
                 constructor = clazz.getConstructor();
                 mutation = (Mutation<String>) constructor.newInstance();
 
-                log.debug("Setting session {} for {}", session, clazz);
+                LOGGER.debug("Setting session {} for {}", session, clazz);
                 // Assumption that the mutation must extend AbstractCassandraMutation, then set session
                 ((AbstractCassandraMutation) mutation).setSession(session);
 
@@ -179,7 +180,7 @@ public class CassandraPlanner extends BasicPlanner<String> {
                         "constructor for class \"" + className + "\"", e);
             }
 
-            log.trace("Leaving loadMutationClass() : {}", mutation);
+            LOGGER.trace("Leaving loadMutationClass() : {}", mutation);
 
             return mutation;
         } catch (InstantiationException e) {
@@ -222,7 +223,7 @@ public class CassandraPlanner extends BasicPlanner<String> {
     public Plan<String> getPlan(Subject<String> subject,
             Coordinator<String> coordinator) {
 
-        log.trace("Entering getPlan(subject={}, coordinator={})", subject, coordinator);
+        LOGGER.trace("Entering getPlan(subject={}, coordinator={})", subject, coordinator);
 
         List<Mutation<String>> subjectMutations =
                 new ArrayList<Mutation<String>>(getMutations());
@@ -232,7 +233,7 @@ public class CassandraPlanner extends BasicPlanner<String> {
 
             Mutation<String> mutation = i.next();
             State<String> targetState = mutation.getResultingState();
-            log.debug("Evaluating mutation {}", mutation);
+            LOGGER.debug("Evaluating mutation {}", mutation);
             // Check by state first
             if (!coordinator.accept(subject, targetState)) {
 
@@ -242,7 +243,7 @@ public class CassandraPlanner extends BasicPlanner<String> {
                     // Check that the md5 hash of the already executed mutation hasn't changed
                     if (DBUtils.isMutationHashCorrect(session, targetState.getID(),
                             ((AbstractCassandraMutation) mutation).getChecksum())) {
-                        log.debug("Rejecting mutation {}", mutation);
+                        LOGGER.debug("Rejecting mutation {}", mutation);
                         i.remove();
                     }
                     else
@@ -264,7 +265,7 @@ public class CassandraPlanner extends BasicPlanner<String> {
         }
 
         BasicPlan basicPlan = new BasicPlan(subject, coordinator, subjectMutations);
-        log.trace("Leaving getPlan() : {}", basicPlan);
+        LOGGER.trace("Leaving getPlan(subject={}, coordinator={})", subject, coordinator);
 
         return basicPlan;
     }

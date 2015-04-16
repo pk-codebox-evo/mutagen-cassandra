@@ -88,7 +88,7 @@ public class MigrationInfoServiceImpl implements MigrationInfoService {
     public MigrationInfo[] success() {
         List<MigrationInfoImpl> successMigrations = new ArrayList<MigrationInfoImpl>();
         for (MigrationInfoImpl migrationInfoImpl : migrationInfos) {
-            if (migrationInfoImpl.getSuccess())
+            if (migrationInfoImpl.getStatus() != "failed")
                 successMigrations.add(migrationInfoImpl);
         }
         return successMigrations.toArray(new MigrationInfoImpl[successMigrations.size()]);
@@ -96,9 +96,11 @@ public class MigrationInfoServiceImpl implements MigrationInfoService {
 
     @Override
     public MigrationInfo failed() {
-        if (migrationInfos.get(migrationInfos.size() - 1).getSuccess())
-            return null;
-        return migrationInfos.get(migrationInfos.size() - 1);
+        if (migrationInfos.get(migrationInfos.size() - 1).getStatus().equals("failed")) {
+            return migrationInfos.get(migrationInfos.size() - 1);
+        }
+        return null;
+
     }
 
     @Override
@@ -111,7 +113,7 @@ public class MigrationInfoServiceImpl implements MigrationInfoService {
 
         for (MigrationInfoImpl migrationInfoImpl : migrationInfos) {
             stringBuffer.append(migrationInfoImpl.toString());
-            }
+        }
 
         return stringBuffer.toString();
     }

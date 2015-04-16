@@ -7,6 +7,7 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import com.datastax.driver.core.ResultSet;
+import com.toddfast.mutagen.cassandra.CassandraMutagen;
 
 public class repairCommandTest extends AbstractTest {
 
@@ -20,19 +21,19 @@ public class repairCommandTest extends AbstractTest {
         Assert.assertNotNull(getResult().getException());
 
         // Make sure there was a recorded failure
-        ResultSet rs = getSession().execute("SELECT success FROM \"Version\"");
+        ResultSet rs = getSession().execute("SELECT status FROM \"Version\"");
 
         boolean mutationHasFailed = false;
         while (!rs.isExhausted()) {
-            if(!rs.one().getBool(0))
+            if (rs.one().getString(0).equals("failed")) {
                 mutationHasFailed = true;
+            }
         }
-        
         Assert.assertTrue(mutationHasFailed);
 
 
         // Instanciate new mutagen object
-        CassandraMutagenImpl mutagen = new CassandraMutagenImpl(getSession());
+        CassandraMutagen mutagen = new CassandraMutagenImpl(getSession());
         mutagen.setLocation(resourcePath);
         mutagen.initialize();
 
@@ -40,11 +41,12 @@ public class repairCommandTest extends AbstractTest {
         mutagen.repair();
 
         // make sure there's no failure in the database
-        rs = getSession().execute("SELECT success FROM \"Version\"");
+        rs = getSession().execute("SELECT status FROM \"Version\"");
 
         while (!rs.isExhausted()) {
-            if (!rs.one().getBool(0))
+            if (rs.one().getString(0).equals("failed")) {
                 Assert.fail();
+            }
         }
 
     }

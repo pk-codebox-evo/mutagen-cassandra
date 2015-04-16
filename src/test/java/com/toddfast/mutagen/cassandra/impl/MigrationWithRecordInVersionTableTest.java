@@ -27,10 +27,9 @@ public class MigrationWithRecordInVersionTableTest extends AbstractTest {
         DBUtils.createSchemaVersionTable(getSession());
         // append two version record
         DBUtils.appendVersionRecord(getSession(), "201502011200", "M201502011200_DoSomeThing_1111.cqlsh.txt",
-                "5ac70f706156a3264c518f0c7d754f7f", 112, true);
+                "5ac70f706156a3264c518f0c7d754f7f", 112, "success");
         DBUtils.appendVersionRecord(getSession(), "201502011209", "M201502011209_DoSomeThing_1111.cqlsh.txt", "",
-                112, true);
-
+                112, "success");
         // Execute mutations
         mutate("mutations/tests/execution");
 

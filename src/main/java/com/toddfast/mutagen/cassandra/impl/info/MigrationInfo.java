@@ -25,7 +25,7 @@ public interface MigrationInfo {
      * @return if the migration success or not.
      * 
      */
-    public boolean getSuccess();
+    public String getStatus();
 
     /**
      * @return the string representation of migration.

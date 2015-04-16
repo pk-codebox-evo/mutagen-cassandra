@@ -7,6 +7,7 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import com.datastax.driver.core.exceptions.InvalidQueryException;
+import com.toddfast.mutagen.cassandra.CassandraMutagen;
 
 public class CleanCommandTest extends AbstractTest {
     
@@ -14,7 +15,7 @@ public class CleanCommandTest extends AbstractTest {
     public void checkVersionTableDropped() throws IOException {
         
         // Instanciate mutagen
-        CassandraMutagenImpl mutagen = new CassandraMutagenImpl(getSession());
+        CassandraMutagen mutagen = new CassandraMutagenImpl(getSession());
 
         // Use working case for test
         mutagen.setLocation("mutations/tests/execution");

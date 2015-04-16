@@ -34,7 +34,7 @@ public class MigrationInfoTest extends AbstractTest {
 
     @Test
     public void migrationInfoWithNoFailedScriptTest() {
-        CassandraMutagenImpl mutagen = new CassandraMutagenImpl(getSession());
+        CassandraMutagen mutagen = new CassandraMutagenImpl(getSession());
         MigrationInfoService migrationService = mutagen.info();
         try {
             mutagen.setLocation("mutations/tests/execution");
@@ -49,6 +49,6 @@ public class MigrationInfoTest extends AbstractTest {
         Assert.assertEquals(migrationService.success().length, 4);
         Assert.assertEquals(migrationService.all().length, 4);
         Assert.assertEquals(migrationService.current().getFilename(), "M201502011230_AddTableTest_1111.cqlsh.txt");
-        Assert.assertEquals(migrationService.current().getSuccess(), true);
+        Assert.assertEquals(migrationService.current().getStatus(), "success");
     }
 }

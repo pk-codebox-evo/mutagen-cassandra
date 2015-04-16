@@ -8,7 +8,7 @@ public class MigrationInfoCommand {
 
     private static final String FILENAME_TITLE = "Filename";
 
-    private static final String STATE_TITLE = "State";
+    private static final String STATUS_TITLE = "Status";
 
     /**
      * private constructor,prevent instantiation.
@@ -30,12 +30,13 @@ public class MigrationInfoCommand {
         int versionWidth = VERSION_TITLE.length();
         int dateWidth = DATE_TITLE.length();
         int filenameWidth = FILENAME_TITLE.length();
-        int stateWidth = 8;
+        int stateWidth = STATUS_TITLE.length();
 
         for (MigrationInfo migrationInfo : migrationInfos) {
             versionWidth = Math.max(versionWidth, migrationInfo.getVersion().toString().length());
             dateWidth = Math.max(dateWidth, migrationInfo.getDate().toString().length());
             filenameWidth = Math.max(filenameWidth, migrationInfo.getFilename().length());
+            stateWidth = Math.max(stateWidth, migrationInfo.getStatus().length());
         }
 
         String ruler = "+-" + trimOrPad("", versionWidth, '-')
@@ -49,7 +50,7 @@ public class MigrationInfoCommand {
         table.append("| ").append(trimOrPad(VERSION_TITLE, versionWidth, ' '))
                 .append(" | ").append(trimOrPad(DATE_TITLE, dateWidth, ' '))
                 .append(" | ").append(trimOrPad(FILENAME_TITLE, filenameWidth, ' '))
-                .append(" | ").append(trimOrPad(STATE_TITLE, stateWidth, ' '))
+                .append(" | ").append(trimOrPad(STATUS_TITLE, stateWidth, ' '))
                 .append(" |\n");
         table.append(ruler);
 
@@ -61,7 +62,7 @@ public class MigrationInfoCommand {
                 table.append(" | ").append(trimOrPad(migrationInfo.getDate().toString(), dateWidth, ' '));
                 table.append(" | ").append(trimOrPad(migrationInfo.getFilename(), filenameWidth, ' '));
                 table.append(" | ").append(
-                        trimOrPad((migrationInfo.getSuccess() ? "success" : "failed"), stateWidth, ' '));
+                        trimOrPad((migrationInfo.getStatus()), stateWidth, ' '));
                 table.append(" |\n");
             }
         }

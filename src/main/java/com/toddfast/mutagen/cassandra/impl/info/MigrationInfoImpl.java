@@ -35,8 +35,8 @@ public class MigrationInfoImpl implements MigrationInfo {
     }
 
     @Override
-    public boolean getSuccess() {
-        return row.getBool("success");
+    public String getStatus() {
+        return row.getString("status");
     }
 
     @Override
@@ -44,7 +44,7 @@ public class MigrationInfoImpl implements MigrationInfo {
         return getVersion()
                 + " | " + getDate()
                 + " | " + getFilename()
-                + " | " + (getSuccess() ? "success" : "failed")
+                + " | " + getStatus()
                 + " | \n";
     };
 }

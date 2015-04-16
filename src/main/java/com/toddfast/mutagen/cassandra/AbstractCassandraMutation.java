@@ -4,14 +4,15 @@ import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.datastax.driver.core.Session;
 import com.toddfast.mutagen.MutagenException;
 import com.toddfast.mutagen.Mutation;
 import com.toddfast.mutagen.State;
 import com.toddfast.mutagen.basic.SimpleState;
 import com.toddfast.mutagen.cassandra.util.DBUtils;
-import com.toddfast.mutagen.cassandra.util.logging.Log;
-import com.toddfast.mutagen.cassandra.util.logging.LogFactory;
 
 /**
  * Base class for cassandra mutation.
@@ -24,16 +25,15 @@ public abstract class AbstractCassandraMutation implements Mutation<String> {
     // //////////////////////////////////////////////////////////////////////////
     // Fields
     // //////////////////////////////////////////////////////////////////////////
+    private final static String fileSeparator = "/"; // file separator
 
-    private Log log = LogFactory.getLog(AbstractCassandraMutation.class);
+    private final static String cqlMigrationSeparator = "_"; // script separator
 
-    private String fileSeparator = "/"; // file separator
-
-    private String cqlMigrationSeparator = "_"; // script separator
+    private static Logger LOGGER = LoggerFactory.getLogger(AbstractCassandraMutation.class);
 
     private Session session; // session
 
-    private State<String> state;
+    private State<String> version = null;
     /**
      * Constructor for AbstractCassandraMutation.
      * 
@@ -41,8 +41,7 @@ public abstract class AbstractCassandraMutation implements Mutation<String> {
      *            the session to execute cql statement
      */
     public AbstractCassandraMutation(Session session) {
-        this.session = session;
-        this.state = null;
+        setSession(session);
     }
 
     /**
@@ -69,7 +68,7 @@ public abstract class AbstractCassandraMutation implements Mutation<String> {
      *         the state of a resource.
      */
     protected final State<String> parseVersion(String resourceName) {
-        log.trace("Entering parseVersion(resourceName={})", resourceName);
+        LOGGER.trace("Entering parseVersion(resourceName={})", resourceName);
 
         String versionString = resourceName;
         int index = versionString.lastIndexOf(fileSeparator);
@@ -98,7 +97,7 @@ public abstract class AbstractCassandraMutation implements Mutation<String> {
                 buffer.append(c);
             }
         }
-        log.trace("Leaving parseVersion() : {}", buffer);
+        LOGGER.trace("Leaving parseVersion() : {}", buffer);
 
         return new SimpleState<String>(buffer.toString());
     }
@@ -130,13 +129,13 @@ public abstract class AbstractCassandraMutation implements Mutation<String> {
      */
     @Override
     public State<String> getResultingState() {
-        log.trace("Entering getResultingState()");
+        LOGGER.trace("Entering getResultingState()");
 
-        if (state == null)
-            state = parseVersion(getResourceName());
+        if (version == null)
+            version = parseVersion(getResourceName());
 
-        log.trace("Leaving getResultingState() : {}", state);
-        return state;
+        LOGGER.trace("Leaving getResultingState() : {}", version);
+        return version;
     }
 
     /**
@@ -156,16 +155,16 @@ public abstract class AbstractCassandraMutation implements Mutation<String> {
     public final void mutate(Context context)
             throws MutagenException {
 
-        log.trace("Entering mutate(context={})", context);
+        LOGGER.trace("Entering mutate(context={})", context);
 
         MutagenException runtimeException = null;
         // Perform the mutation
         boolean success = true;
         long startTime = System.currentTimeMillis();
         try {
-            log.trace("Entering performMutation(context={})", context);
+            LOGGER.trace("Entering performMutation(context={})", context);
             performMutation(context);
-            log.trace("Leaving performMutation()");
+            LOGGER.trace("Leaving performMutation()");
 
         } catch (MutagenException e) {
             success = false;
@@ -182,12 +181,17 @@ public abstract class AbstractCassandraMutation implements Mutation<String> {
         String checksum = getChecksum();
 
         // append version record
-        DBUtils.appendVersionRecord(session, version, getResourceName(), checksum, (int) execution_time, success);
+        if (success) {
+            DBUtils.appendVersionRecord(session, version, getResourceName(), checksum, (int) execution_time, "success");
+        }
+        else {
+            DBUtils.appendVersionRecord(session, version, getResourceName(), checksum, (int) execution_time, "failed");
+        }
 
         if (runtimeException != null)
             throw runtimeException;
 
-        log.trace("Leaving mutate()");
+        LOGGER.trace("Leaving mutate()");
 
     }
 
@@ -260,15 +264,22 @@ public abstract class AbstractCassandraMutation implements Mutation<String> {
 
         return hexString.toString();
     }
-    
-    public void dummyExecution() {
+
+    /**
+     * execute baseline.
+     */
+    public void dummyExecution(String baselineVersion) {
         String version = getResultingState().getID();
 
         // caculate the checksum
         String checksum = getChecksum();
 
         // append version record
-        DBUtils.appendVersionRecord(session, version, getResourceName(), checksum, 0, true);
+        if (version.compareTo(baselineVersion) < 0) {
+            DBUtils.appendVersionRecord(session, version, getResourceName(), checksum, 0, "<baseline");
+        } else if (version.compareTo(baselineVersion) == 0) {
+            DBUtils.appendVersionRecord(session, version, getResourceName(), checksum, 0, "baseline");
+        }
     }
     
 }

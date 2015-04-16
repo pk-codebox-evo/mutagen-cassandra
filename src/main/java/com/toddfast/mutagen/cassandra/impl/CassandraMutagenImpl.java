@@ -1,8 +1,10 @@
 package com.toddfast.mutagen.cassandra.impl;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Properties;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.datastax.driver.core.Session;
 import com.toddfast.mutagen.MutagenException;
@@ -17,29 +19,20 @@ import com.toddfast.mutagen.cassandra.impl.info.MigrationInfoService;
 import com.toddfast.mutagen.cassandra.impl.info.MigrationInfoServiceImpl;
 import com.toddfast.mutagen.cassandra.util.DBUtils;
 import com.toddfast.mutagen.cassandra.util.LoadResources;
-import com.toddfast.mutagen.cassandra.util.logging.Log;
-import com.toddfast.mutagen.cassandra.util.logging.LogFactory;
 
 /**
  * An implementation for cassandraMutagen.
  * It execute all the migration tasks.
  * It is the enter point of application.
  */
-public class CassandraMutagenImpl implements CassandraMutagen {
-    private Session session;
+public class CassandraMutagenImpl extends CassandraMutagen {
 
-    private static Log log = LogFactory.getLog(CassandraMutagenImpl.class);
-
-    private List<String> resources;
-
-    private String baselineVersion = "000000000000";
-
-    private String location = "mutations";
+    private static Logger LOGGER = LoggerFactory.getLogger(CassandraMutagenImpl.class);
 
     private MigrationInfoService migrationInfoService;
 
     public CassandraMutagenImpl(Session session) {
-        this.session = session;
+        super(session);
     }
     /**
      * Loads the resources.
@@ -47,56 +40,9 @@ public class CassandraMutagenImpl implements CassandraMutagen {
      */
     public void initialize()
             throws IOException {
-        log.debug("Initialising with resourcePath {}", location);
-        resources = LoadResources.loadResources(this, location);
+        LOGGER.debug("Initialising with resourcePath {}", getLocation());
+        setResources(LoadResources.loadResources(this, getLocation()));
 
-    }
-
-    /**
-     * Return the resources founded.
-     *
-     * @return resources
-     */
-    private List<String> getResources() {
-        return resources;
-    }
-
-    /**
-     * getter for baseline.
-     * 
-     * @return baseline version.
-     */
-    public String getBaselineVersion() {
-        return baselineVersion;
-    }
-
-    /**
-     * setter for baseline.
-     * 
-     * @param baselineVersion
-     *            - baseline version.
-     */
-    public void setBaselineVersion(String baselineVersion) {
-        this.baselineVersion = baselineVersion;
-    }
-
-    /**
-     * getter for location.
-     * 
-     * @return location.
-     */
-    public String getLocation() {
-        return location;
-    }
-
-    /**
-     * setter for location.
-     * 
-     * @param location
-     *            - location.
-     */
-    public void setLocation(String location) {
-        this.location = location;
     }
 
     /**
@@ -111,6 +57,7 @@ public class CassandraMutagenImpl implements CassandraMutagen {
         }
 
         String location = properties.getProperty("location");
+
         if (location != null) {
             setLocation(location);
         }
@@ -122,15 +69,15 @@ public class CassandraMutagenImpl implements CassandraMutagen {
      * @return mutations plan
      */
     public Plan<String> getMutationsPlan() {
-        log.trace("Entering getMutationsPlan(session={})", session);
-        CassandraCoordinator coordinator = new CassandraCoordinator(session);
-        CassandraSubject subject = new CassandraSubject(session);
+        LOGGER.trace("Entering getMutationsPlan(session={})", getSession());
+        CassandraCoordinator coordinator = new CassandraCoordinator(getSession());
+        CassandraSubject subject = new CassandraSubject(getSession());
 
         Planner<String> planner =
-                new CassandraPlanner(session, getResources());
+                new CassandraPlanner(getSession(), getResources());
         Plan<String> plan = planner.getPlan(subject, coordinator);
 
-        log.trace("Leaving getMutationsPlan() : {}", plan);
+        LOGGER.trace("Leaving getMutationsPlan(session={})", getSession());
         return plan;
     }
 
@@ -142,18 +89,18 @@ public class CassandraMutagenImpl implements CassandraMutagen {
      */
     @Override
     public Plan.Result<String> mutate() {
-        log.trace("Entering mutate(session={})", session);
+        LOGGER.trace("Entering mutate(session={})", getSession());
         Result<String> mutationsResult;
 
 
         // Do this in a VM-wide critical section. External cluster-wide
         // synchronization is going to have to happen in the coordinator.
         synchronized (System.class) {
-
-            mutationsResult = getMutationsPlan().execute();
+            Plan<String> plan = getMutationsPlan();
+            mutationsResult = plan.execute();
         }
 
-        log.trace("Leaving mutate()", mutationsResult);
+        LOGGER.trace("Leaving mutate()", mutationsResult);
         return mutationsResult;
 
     }
@@ -165,8 +112,7 @@ public class CassandraMutagenImpl implements CassandraMutagen {
     public void clean() {
         System.out.println("Cleaning...");
 
-        // TRUNCATE instead of drop ?
-        DBUtils.dropSchemaVersionTable(session);
+        DBUtils.dropSchemaVersionTable(getSession());
 
         System.out.println("Done");
 
@@ -180,7 +126,7 @@ public class CassandraMutagenImpl implements CassandraMutagen {
     public void repair() {
         System.out.println("Repairing...");
 
-        DBUtils.deleteFailedVersionRecord(session);
+        DBUtils.deleteFailedVersionRecord(getSession());
 
         System.out.println("Done");
 
@@ -195,7 +141,10 @@ public class CassandraMutagenImpl implements CassandraMutagen {
         System.out.println("Baseline...");
 
         synchronized (System.class) {
-            new BaseLine(this, session, baselineVersion).baseLine();
+            if (getBaselineVersion() != null)
+                new BaseLine(this, getSession(), getBaselineVersion()).baseLine();
+            else
+                new BaseLine(this, getSession()).baseLine();
         }
         System.out.println("Done with baseline");
 
@@ -204,14 +153,16 @@ public class CassandraMutagenImpl implements CassandraMutagen {
     /**
      * Retrives the complete information about all the migrations.
      * 
-     * @param session
-     *            - the session to execute the cql.
+     * @param getSession
+     *            ()
+     *            - the getSession() to execute the cql.
      * @return instance of MigrationInfoService.
+     * 
      */
     public MigrationInfoService info() {
-        if (migrationInfoService == null)
-            return new MigrationInfoServiceImpl(session);
-        else
+        if (migrationInfoService == null) {
+            migrationInfoService = new MigrationInfoServiceImpl(getSession());
+        }
             return migrationInfoService;
     }
 }

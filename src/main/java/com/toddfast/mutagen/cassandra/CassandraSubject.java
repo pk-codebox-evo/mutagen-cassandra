@@ -3,6 +3,7 @@ package com.toddfast.mutagen.cassandra;
 import com.datastax.driver.core.Session;
 import com.toddfast.mutagen.State;
 import com.toddfast.mutagen.Subject;
+import com.toddfast.mutagen.basic.SimpleState;
 import com.toddfast.mutagen.cassandra.util.DBUtils;
 
 /**
@@ -15,11 +16,8 @@ import com.toddfast.mutagen.cassandra.util.DBUtils;
  */
 public class CassandraSubject implements Subject<String> {
 
-    // //////////////////////////////////////////////////////////////////////////
-    // Fields
-    // //////////////////////////////////////////////////////////////////////////
-
     private Session session; // session
+
     /**
      * Constructor for cassandraSubjet.
      * 
@@ -34,6 +32,8 @@ public class CassandraSubject implements Subject<String> {
 
     @Override
     public State<String> getCurrentState() {
-        return DBUtils.getCurrentState(session);
+        String current = DBUtils.getCurrentState(session);
+        SimpleState<String> currentState = new SimpleState<String>(current);
+        return currentState;
     }
 }
