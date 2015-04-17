@@ -266,7 +266,7 @@ public abstract class AbstractCassandraMutation implements Mutation<String> {
     }
 
     /**
-     * execute baseline.
+     * baseline execution.
      */
     public void dummyExecution(String baselineVersion) {
         String version = getResultingState().getID();
@@ -276,9 +276,9 @@ public abstract class AbstractCassandraMutation implements Mutation<String> {
 
         // append version record
         if (version.compareTo(baselineVersion) < 0) {
-            DBUtils.appendVersionRecord(session, version, getResourceName(), checksum, 0, "<baseline");
+            DBUtils.appendVersionRecord(session, version, getResourceName(), checksum, 0, "<Baseline");
         } else if (version.compareTo(baselineVersion) == 0) {
-            DBUtils.appendVersionRecord(session, version, getResourceName(), checksum, 0, "baseline");
+            DBUtils.appendVersionRecord(session, version, getResourceName(), checksum, 0, "Baseline");
         }
     }
     

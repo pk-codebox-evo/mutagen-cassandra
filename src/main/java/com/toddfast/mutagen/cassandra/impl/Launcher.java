@@ -27,7 +27,6 @@ public class Launcher {
 
         // initialisation with resourcePath, necessary for mutate and baseline
         CassandraMutagen mutagen = initialiseMutagen(session, RESOURCE_PATH);
-
         // Clean
         // mutagen.clean(session);
 

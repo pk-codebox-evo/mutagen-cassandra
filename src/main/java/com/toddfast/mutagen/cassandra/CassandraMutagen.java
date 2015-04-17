@@ -72,13 +72,14 @@ public abstract class CassandraMutagen {
     public abstract void repair();
 
     /**
-     * Retrive the complete information about all the migrations.
+     * Retrieve the complete information about all the migrations.
      * 
      * @return instance of MigrationInfoService.
      * 
      */
     public abstract MigrationInfoService info();
 
+    // getter and setter for variables.
     /**
      * getter for session.
      * 

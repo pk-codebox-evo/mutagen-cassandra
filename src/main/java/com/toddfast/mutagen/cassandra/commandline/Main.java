@@ -18,6 +18,7 @@ import com.toddfast.mutagen.Plan;
 import com.toddfast.mutagen.Plan.Result;
 import com.toddfast.mutagen.cassandra.CassandraMutagen;
 import com.toddfast.mutagen.cassandra.impl.CassandraMutagenImpl;
+import com.toddfast.mutagen.cassandra.impl.info.MigrationInfoCommand;
 
 public class Main {
     private static Logger LOGGER = LoggerFactory.getLogger(Main.class);
@@ -65,7 +66,7 @@ public class Main {
             showMigrationResults(mutationResult);
         } else if ("info".equals(operation)) {
             mutagen.info().refresh();
-            LOGGER.info("\n" + mutagen.info().toString());
+            LOGGER.info("\n" + MigrationInfoCommand.printInfo(mutagen.info().all()));
         } else if ("repair".equals(operation)) {
             mutagen.repair();
         } else {
@@ -203,6 +204,9 @@ public class Main {
                 .getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
         
         for (String arg : args) {
+            if ("-I".equals(arg)) {
+                root.setLevel(Level.INFO);
+            }
             if ("-X".equals(arg)) {
                 root.setLevel(Level.DEBUG);
             }
@@ -317,6 +321,7 @@ public class Main {
         LOGGER.info("Options (Format: -key=value)");
         LOGGER.info("=======");
         LOGGER.info("baselineVersion        : Version to tag schema with when executing baseline");
+        LOGGER.info("location               : Classpath locations to sacn recursively for migrations");
         LOGGER.info("");
         LOGGER.info("Add -X to print debug output");
         LOGGER.info("Add -q to suppress all output, except for errors and warnings");
@@ -324,6 +329,7 @@ public class Main {
         LOGGER.info("Example");
         LOGGER.info("=======");
         LOGGER.info("mutagen -baselineVersion=201412311234 baseline");
+        LOGGER.info("mutagen -location=mutations migrate");
         LOGGER.info("");
     }
 }

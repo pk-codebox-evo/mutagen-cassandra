@@ -46,7 +46,7 @@ public class BaseLine {
             }
         }
         if (!DBUtils.isVersionIdPresent(session, baselineVersion)) {
-            DBUtils.appendVersionRecord(session, baselineVersion, "", "", 0, "baseline");
+            DBUtils.appendVersionRecord(session, baselineVersion, "", "", 0, "Baseline");
         }
     }
 
