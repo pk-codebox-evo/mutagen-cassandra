@@ -1,7 +1,12 @@
 package com.toddfast.mutagen.cassandra.commandline;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -25,30 +30,24 @@ public class Main {
 
     public static void main(String[] args) {
         initLogging(args);
+        // detect operations
+        List<String> operations = determineOperations(args);
+        if (operations.isEmpty()) {
+            printUsage();
+            return;
+        }
+        // init properties
+        Properties properties = new Properties();
+        loadProperties(properties);
+        overrideConfiguration(properties, args);
+        loadLocationToClasspath(properties);
 
-        try {
-            List<String> operations = determineOperations(args);
-            if (operations.isEmpty()) {
-                printUsage();
-                return;
-            }
-
-            Properties properties = new Properties();
-            loadProperties(properties);
-            overrideConfiguration(properties, args);
-
-            Session session = createSession(properties);
+        try (Cluster cluster = createCluster(properties);
+                Session session = createSession(cluster, properties)) {
             CassandraMutagen mutagen = new CassandraMutagenImpl(session);
             mutagen.configure(properties);
-            mutagen.initialize();
-
             for (String operation : operations) {
                 executeOperation(mutagen, operation);
-            }
-            // close session and cluster
-            if (session != null) {
-                session.close();
-                session.getCluster().close();
             }
         } catch (Exception e) {
             LOGGER.error("Unexpected error", e);
@@ -60,10 +59,16 @@ public class Main {
         if ("clean".equals(operation)) {
             mutagen.clean();
         } else if ("baseline".equals(operation)) {
+            loadResources(mutagen);
             mutagen.baseline();
         } else if ("migrate".equals(operation)) {
+            loadResources(mutagen);
             Result<String> mutationResult = mutagen.mutate();
+
             showMigrationResults(mutationResult);
+            if (mutationResult.getException() != null) {
+                throw mutationResult.getException();
+            }
         } else if ("info".equals(operation)) {
             mutagen.info().refresh();
             LOGGER.info("\n" + MigrationInfoCommand.printInfo(mutagen.info().all()));
@@ -75,6 +80,95 @@ public class Main {
             System.exit(1);
         }
 
+    }
+
+    /**
+     * Add the location in the classpath.
+     * 
+     * @param properties
+     */
+    public static void loadLocationToClasspath(Properties properties) {
+        String location = properties.getProperty("location");
+        if (location == null || location.indexOf("/") < 0) {
+            addToClassPath(".");
+            return;
+        }
+
+        if (location.lastIndexOf("/") == location.length() - 1) {
+            location = location.substring(0, location.length() - 1);
+        }
+        if (location.lastIndexOf("/") > 0) {
+            location = location.substring(0, location.lastIndexOf("/"));
+        }
+
+        addToClassPath(location);
+    }
+
+    /**
+     * Check if the path is in the classpath.
+     * 
+     * @param path
+     *            - path.
+     * @return boolean.
+     */
+    public static boolean isInClassPath(String path) {
+        URLClassLoader urlClassLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
+        URL[] urls = urlClassLoader.getURLs();
+        for (URL url : urls) {
+            if (path.equals(url.toString()))
+                return true;
+        }
+        return false;
+    }
+
+    /**
+     * Add the resources under the classpath.
+     * 
+     * @param path
+     *            - the resource path.
+     */
+    public static void addToClassPath(String path) {
+        if (isInClassPath(path))
+            return;
+
+        try {
+            URL url = new File(path).toURI().toURL();
+            URLClassLoader urlClassLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
+            Class<URLClassLoader> urlClass = URLClassLoader.class;
+            Method method = urlClass.getDeclaredMethod("addURL", new Class[] { URL.class });
+            method.setAccessible(true);
+            method.invoke(urlClassLoader, new Object[] { url });
+        } catch (Exception e) {
+            throw new RuntimeException("Can not load " + path, e);
+        }
+    }
+
+    /**
+     * Load resources.
+     * 
+     * @param mutagen
+     * @throws IOException
+     */
+    private static void loadResources(CassandraMutagen mutagen) {
+        try {
+            String location = mutagen.getLocation();
+            if (location == null) {
+                return;
+            }
+            if (location.lastIndexOf("/") == location.length() - 1) {
+                location = location.substring(0, location.length() - 1);
+            }
+            if (location.lastIndexOf("/") > 0) {
+                location = location.substring(location.lastIndexOf("/") + 1, location.length());
+            }
+
+            mutagen.setLocation(location);
+
+            mutagen.initialize();
+        } catch (IOException e) {
+            LOGGER.error("Can not load resources");
+            throw new RuntimeException("Can not load resources");
+        }
     }
 
     /**
@@ -100,16 +194,12 @@ public class Main {
      *            - properties
      * @return
      */
-    private static Session createSession(Properties properties) {
-        Cluster cluster = createCluster(properties);
-        Session session = null;
-        // create session
+    private static Session createSession(Cluster cluster, Properties properties) {
+
         String keyspace = getProperty(properties, "keyspace");
-        if (keyspace != null)
-            session = cluster.connect(keyspace);
-        else
-            session = cluster.connect();
-        return session;
+        return (keyspace != null ?
+                cluster.connect(keyspace) :
+                cluster.connect());
 
     }
 
@@ -202,7 +292,7 @@ public class Main {
     static void initLogging(String[] args) {
         ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) LoggerFactory
                 .getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
-        
+
         for (String arg : args) {
             if ("-I".equals(arg)) {
                 root.setLevel(Level.INFO);
@@ -323,13 +413,14 @@ public class Main {
         LOGGER.info("baselineVersion        : Version to tag schema with when executing baseline");
         LOGGER.info("location               : Classpath locations to sacn recursively for migrations");
         LOGGER.info("");
+        LOGGER.info("Add -I to print info output");
         LOGGER.info("Add -X to print debug output");
         LOGGER.info("Add -q to suppress all output, except for errors and warnings");
         LOGGER.info("");
         LOGGER.info("Example");
         LOGGER.info("=======");
         LOGGER.info("mutagen -baselineVersion=201412311234 baseline");
-        LOGGER.info("mutagen -location=mutations migrate");
+        LOGGER.info("mutagen -location=/path/mutations migrate");
         LOGGER.info("");
     }
 }

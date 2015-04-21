@@ -25,7 +25,7 @@ public class repairCommandTest extends AbstractTest {
 
         boolean mutationHasFailed = false;
         while (!rs.isExhausted()) {
-            if (rs.one().getString(0).equals("failed")) {
+            if (rs.one().getString(0).equals("Failed")) {
                 mutationHasFailed = true;
             }
         }
@@ -44,7 +44,7 @@ public class repairCommandTest extends AbstractTest {
         rs = getSession().execute("SELECT status FROM \"Version\"");
 
         while (!rs.isExhausted()) {
-            if (rs.one().getString(0).equals("failed")) {
+            if (rs.one().getString(0).equals("Failed")) {
                 Assert.fail();
             }
         }

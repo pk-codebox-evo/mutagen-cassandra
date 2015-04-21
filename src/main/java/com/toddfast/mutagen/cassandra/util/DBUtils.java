@@ -118,15 +118,15 @@ public class DBUtils {
      *            checksum for validation.
      * @param execution_time
      *            The execution time(ms) for this script file.
-     * @param success
-     *            represents if this execution successes.
+     * @param status
+     *            represents the result of migration.
      */
     public static void appendVersionRecord(Session session, String version, String filename, String checksum,
             int execution_time,
             String status) {
 
         log.trace(
-                "Entering appendVersionRecord(session={}, version={}, filename={}, checksum={}, execution_time={}, success={})",
+                "Entering appendVersionRecord(session={}, version={}, filename={}, checksum={}, execution_time={}, status={})",
                 session, version, filename, checksum, execution_time, status);
 
         // insert statement for version record
@@ -189,7 +189,7 @@ public class DBUtils {
 
         while (!rs.isExhausted()) {
             Row r = rs.one();
-            if (r.getString("status").equals("failed")) {
+            if (r.getString("status").equals("Failed")) {
                 log.info("The following record has been selected for deletion : {}", r);
                 selectedRows.add(r);
             }
@@ -227,7 +227,7 @@ public class DBUtils {
         boolean hasFailed = false;
 
         // if there's one and only one row, and the mutation has failed
-        if (rows.size() == 1 && rows.get(0).getString("status").equals("failed"))
+        if (rows.size() == 1 && rows.get(0).getString("status").equals("Failed"))
             hasFailed = true;
 
         log.trace("Executed isVersionIdPresent(session={}, versionId={}) : {}", session, versionId, hasFailed);
@@ -293,7 +293,7 @@ public class DBUtils {
             log.trace("Parsing row {}", r);
 
             String versionid = r.getString("versionid");
-            if ((!r.getString("status").equals("failed")) && version.compareTo(versionid) < 0)
+            if ((!r.getString("status").equals("Failed")) && version.compareTo(versionid) < 0)
                 version = versionid;
         }
 

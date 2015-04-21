@@ -182,10 +182,10 @@ public abstract class AbstractCassandraMutation implements Mutation<String> {
 
         // append version record
         if (success) {
-            DBUtils.appendVersionRecord(session, version, getResourceName(), checksum, (int) execution_time, "success");
+            DBUtils.appendVersionRecord(session, version, getResourceName(), checksum, (int) execution_time, "Success");
         }
         else {
-            DBUtils.appendVersionRecord(session, version, getResourceName(), checksum, (int) execution_time, "failed");
+            DBUtils.appendVersionRecord(session, version, getResourceName(), checksum, (int) execution_time, "Failed");
         }
 
         if (runtimeException != null)

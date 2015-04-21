@@ -17,9 +17,7 @@ public class BaseLine {
 
     // Methods
     public BaseLine(CassandraMutagen mutagen, Session session) {
-        this.mutagen = mutagen;
-        this.session = session;
-        this.baselineVersion = "000000000001";
+        this(mutagen, session, "000000000001");
     }
 
     public BaseLine(CassandraMutagen mutagen, Session session, String baselineVersion) {

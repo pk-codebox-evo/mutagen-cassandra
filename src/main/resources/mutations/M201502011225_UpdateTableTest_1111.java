@@ -18,6 +18,7 @@ public class M201502011225_UpdateTableTest_1111 extends NewCassandraMigrator {
             String updateStatement = "update \"Test1\" set value1='chicken', value2='sneeze' " +
                     "where key='row2';";
             getSession().execute(updateStatement);
+            context.debug("Done executing mutation {}", getResultingState().getID());
         } catch (Exception e) {
             throw new MutagenException("Could not update columnfamily Test1", e);
         }

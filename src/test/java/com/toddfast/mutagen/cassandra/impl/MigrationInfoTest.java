@@ -49,6 +49,6 @@ public class MigrationInfoTest extends AbstractTest {
         Assert.assertEquals(migrationService.success().length, 4);
         Assert.assertEquals(migrationService.all().length, 4);
         Assert.assertEquals(migrationService.current().getFilename(), "M201502011230_AddTableTest_1111.cqlsh.txt");
-        Assert.assertEquals(migrationService.current().getStatus(), "success");
+        Assert.assertEquals(migrationService.current().getStatus(), "Success");
     }
 }

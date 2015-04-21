@@ -71,16 +71,6 @@ public abstract class NewCassandraMigrator extends AbstractCassandraMutation {
     }
 
     private void initialize(String keyspace, String[] args) {
-        // this.keyspace = keyspace;
-        // String propertiesPath = System.getProperty("cassandra.properties.file");
-        // if (propertiesPath == null) {
-        // throw new RuntimeException(
-        // "System property 'cassandra.properties.file' required.");
-        // }
-        // // TODO seems useless, no?
-        // Map<String, String> map = new HashMap<String, String>();
-        // PropertiesUtils.loadProperties(propertiesPath, map);
-
         for (String arg : args) {
             if ("--dry".equals(arg)) {
                 dry = true;
@@ -126,16 +116,7 @@ public abstract class NewCassandraMigrator extends AbstractCassandraMutation {
      * @throws IOException
      */
     private void printHelp() {
-        // PrintStream o = System.out;
-        //
-        // o.println("SYNOPSIS");
-        // MainUtils.printSynopsis(o, getClass(), "[options]");
-        // o.println("DESCRIPTION");
-        // MainUtils.printSentence(o, "Migration for APISpark 3.3.0");
-        // o.println("OPTIONS");
-        // MainUtils.printOption(o, "-h", "Prints this help");
-        // MainUtils.printOption(o, "-stat",
-        // "if set, just display the list of migration instructions");
+
     }
 
     /**

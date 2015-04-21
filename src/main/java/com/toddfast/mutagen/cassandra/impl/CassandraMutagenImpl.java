@@ -141,10 +141,11 @@ public class CassandraMutagenImpl extends CassandraMutagen {
         System.out.println("Baseline...");
 
         synchronized (System.class) {
-            if (getBaselineVersion() != null)
+            if (getBaselineVersion() != null) {
                 new BaseLine(this, getSession(), getBaselineVersion()).baseLine();
-            else
+            } else {
                 new BaseLine(this, getSession()).baseLine();
+            }
         }
         System.out.println("Done with baseline");
 

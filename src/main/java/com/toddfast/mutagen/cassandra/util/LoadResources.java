@@ -126,5 +126,4 @@ public class LoadResources {
         }
         return resources;
     }
-
 }
