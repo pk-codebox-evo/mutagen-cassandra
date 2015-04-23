@@ -95,7 +95,7 @@ public class CQLMutation extends AbstractCassandraMutation {
             if (trimmedLine.startsWith("--") || trimmedLine.startsWith("//")) {
                 // Skip
             }
-            else if ((index = line.indexOf(";")) != -1) {
+            else if ((index = line.lastIndexOf(";")) != -1) {
                 // Split the line at the semicolon
                 statement
                         .append("\n")

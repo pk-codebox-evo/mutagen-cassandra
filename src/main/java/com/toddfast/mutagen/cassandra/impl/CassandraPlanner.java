@@ -110,12 +110,18 @@ public class CassandraPlanner extends BasicPlanner<String> {
             states.add(m.getResultingState().getID());
         }
 
-        // create set from states list to get unicity.
-        Set<String> set = new HashSet<String>(states);
+        // create set to get duplicate state.
+        Set<String> set = new HashSet<String>();
+        ArrayList<String> duplicateResourceState = new ArrayList<String>();
+        for (String state : states) {
+            if (!set.add(state)) {
+                duplicateResourceState.add(state);
+            }
+        }
 
         // if sizes differ there's a duplicate
-        if (set.size() < states.size())
-            throw new MutagenException("Two migration scripts possess the same state");
+        if (duplicateResourceState.size() > 0)
+            throw new MutagenException("Two migration scripts possess the same state" + duplicateResourceState);
 
     }
 
@@ -127,7 +133,7 @@ public class CassandraPlanner extends BasicPlanner<String> {
      * @return
      */
     private static boolean validate(String resource) {
-        String pattern = "^M(\\d{12})_([a-zA-z]+)_(\\d{4})\\.((java)|(class)|(cqlsh\\.txt))$"; // convention of script
+        String pattern = "^M(\\d{12})_([a-zA-z]+)(.*)\\.((java)|(class)|(cqlsh\\.txt))$"; // convention of script
         // file
         String fileSeparator = "/"; // file separator
         String resourceName = resource.substring(resource.lastIndexOf(fileSeparator) + 1);

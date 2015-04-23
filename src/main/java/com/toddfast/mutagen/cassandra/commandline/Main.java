@@ -404,7 +404,6 @@ public class Main {
         LOGGER.info("migrate  : Migrates the database");
         LOGGER.info("clean    : Drops all objects in the configured schemas");
         LOGGER.info("info     : Prints the information about applied, current and pending migrations");
-        LOGGER.info("validate : Validates the applied migrations against the ones on the classpath");
         LOGGER.info("baseline : Baselines an existing database at the baselineVersion");
         LOGGER.info("repair   : Repairs the metadata table");
         LOGGER.info("");

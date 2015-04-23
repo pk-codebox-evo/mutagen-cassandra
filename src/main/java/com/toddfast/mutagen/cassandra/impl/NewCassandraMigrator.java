@@ -6,21 +6,15 @@
 
 package com.toddfast.mutagen.cassandra.impl;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.datastax.driver.core.BoundStatement;
-import com.datastax.driver.core.PreparedStatement;
-import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Session;
 import com.toddfast.mutagen.cassandra.AbstractCassandraMutation;
 
@@ -34,72 +28,23 @@ public abstract class NewCassandraMigrator extends AbstractCassandraMutation {
 
     private static Logger LOGGER = LoggerFactory.getLogger(NewCassandraMigrator.class);
 
-    public static final String KEYSPACE_APISPARK = "apispark";
-
-    public static final String DEFAULT_QUERY_LIMIT = " limit " + 1_000_000_000;
-
-    public static final int DEFAULT_FETCH_SIZE = 1000;
-
-    private boolean manualRun = false;
-
-    private boolean dry;
-
-    // Used only for manual execution.
-    private Session scriptOnlySession;
-
-    public NewCassandraMigrator(Session session) {
-        super(session);
-    }
-
+    /**
+     * Empty constructor.
+     */
     public NewCassandraMigrator() {
         this(null);
     }
 
     /**
-     * Run the migration script with given program arguments. <br>
-     * Run with <code>-h</code> argument to display help. <br>
-     * Run with <code>--dry</code> argument to print only the statements without
-     * executing them.
+     * constructor with session.
      * 
-     * @param args
-     *            The program arguments
+     * @param session
+     *            - session.
      */
-    public void run(String[] args) {
-        LOGGER.debug("Starting manual execution of {}", getResourceName());
-        initialize(KEYSPACE_APISPARK, args);
-        executeManual();
+    public NewCassandraMigrator(Session session) {
+        super(session);
     }
 
-    private void initialize(String keyspace, String[] args) {
-        for (String arg : args) {
-            if ("--dry".equals(arg)) {
-                dry = true;
-            } else if ("-h".equals(arg) || "--help".equals(arg)) {
-                printHelp();
-                System.exit(0);
-            } else {
-                System.out.println("Unknown option: " + arg);
-                printHelp();
-                System.exit(1);
-            }
-        }
-    }
-
-    public final void executeManual() {
-        LOGGER.debug("Setting scriptOnlySession");
-        setScriptOnlySession(Launcher.launchConnection());
-
-        LOGGER.info("Calling performMutation()");
-        try {
-            // mutate
-            // context should only be used for logging
-            performMutation(new CassandraContext(null, null));
-        } finally {
-            LOGGER.debug("Closing session");
-            getSession().close();
-
-        }
-    }
 
     /**
      * Override to add migration code.
@@ -110,141 +55,6 @@ public abstract class NewCassandraMigrator extends AbstractCassandraMutation {
     @Override
     protected abstract void performMutation(Context context);
 
-    /**
-     * Affiche l'aide de la commande.
-     * 
-     * @throws IOException
-     */
-    private void printHelp() {
-
-    }
-
-    /**
-     * Executes a shell command or prints a trace.
-     * 
-     * @param command
-     *            The command to execute.
-     */
-    public void executeShellCommand(String command) {
-        if (dry) {
-            System.out.println(command);
-        } else {
-            String s = null;
-            try {
-                Process p = Runtime.getRuntime().exec(
-                        new String[] { "sh", "-c", command });
-
-                BufferedReader stdInput = new BufferedReader(
-                        new InputStreamReader(p.getInputStream()));
-
-                BufferedReader stdError = new BufferedReader(
-                        new InputStreamReader(p.getErrorStream()));
-
-                // read the output from the command
-                while ((s = stdInput.readLine()) != null) {
-                    System.out.println(s);
-                }
-
-                // read any errors from the attempted command
-                while ((s = stdError.readLine()) != null) {
-                    System.err.println(s);
-                }
-            } catch (IOException e) {
-                System.out.println("exception happened - here's what I know: ");
-                e.printStackTrace();
-            }
-        }
-    }
-
-    /**
-     * Executes a curl command or prints a trace.
-     * 
-     * @param command
-     *            The command to execute.
-     */
-    public String executeCurlCommand(String command) {
-        String s = "";
-        StringBuffer sb = new StringBuffer();
-
-        if (dry) {
-            System.out.println(command);
-        } else {
-            try {
-                Process p = Runtime.getRuntime().exec(
-                        new String[] { "sh", "-c", command });
-
-                BufferedReader stdInput = new BufferedReader(
-                        new InputStreamReader(p.getInputStream()));
-
-                // read the output from the command
-                while ((s = stdInput.readLine()) != null) {
-                    sb.append(s);
-                }
-            } catch (IOException e) {
-                System.out.println("exception happened - here's what I know: ");
-                e.printStackTrace();
-            }
-        }
-        return sb.toString();
-    }
-
-    /**
-     * Executes an update request or prints a trace.
-     * 
-     * @param statement
-     *            The statement to execute.
-     * @param values
-     *            The values.
-     */
-    public void executeUpdate(String statement, Object... values) {
-        executeUpdate(getSession().prepare(statement), values);
-    }
-
-    /**
-     * Prepares a statement.
-     * 
-     * @param request
-     *            The request to prepare.
-     */
-    public PreparedStatement prepare(String request) {
-        return getSession().prepare(request);
-    }
-
-    /**
-     * Executes an update request or prints a trace.
-     * 
-     * @param statement
-     *            The statement to execute.
-     * @param values
-     *            The values.
-     */
-    public void executeUpdate(PreparedStatement statement, Object... values) {
-        if (dry) {
-            System.out.println(statement.getQueryString() + " << "
-                    + Arrays.asList(values));
-        } else {
-            BoundStatement boundStatement = statement.bind(values);
-            getSession().execute(boundStatement);
-        }
-    }
-
-    /**
-     * Execute a request or prints a trace.
-     * 
-     * @param request
-     *            The request to execute.
-     * @return
-     */
-    public ResultSet query(String statement, Object... values) {
-        if (!statement.startsWith("select")) {
-            throw new RuntimeException(
-                    "A query request should starts with select statement.");
-        }
-        PreparedStatement psu = getSession().prepare(statement);
-        BoundStatement boundStatement = psu.bind(values);
-        boundStatement.setFetchSize(DEFAULT_FETCH_SIZE);
-        return getSession().execute(boundStatement);
-    }
 
     @Override
     // return class name (with package hierarchy) and replace semicolons by "/" for correct version parsing
@@ -267,24 +77,6 @@ public abstract class NewCassandraMigrator extends AbstractCassandraMutation {
             throw new RuntimeException("unable to get checksum");
         }
 
-    }
-
-    public Session getSession() {
-        if (manualRun) {
-            LOGGER.trace("Executing getSession() : {}, session is scriptOnly");
-            return scriptOnlySession;
-        }
-        else
-        {
-            LOGGER.trace("Executing getSession() : {}");
-            return super.getSession();
-        }
-    }
-
-    public void setScriptOnlySession(Session scriptOnlySession) {
-        LOGGER.trace("Calling setScriptOnlySession(session={})", scriptOnlySession);
-        this.scriptOnlySession = scriptOnlySession;
-        this.manualRun = true;
     }
 
     public static final byte[] getClassContents(Class<?> myClass) throws IOException {
