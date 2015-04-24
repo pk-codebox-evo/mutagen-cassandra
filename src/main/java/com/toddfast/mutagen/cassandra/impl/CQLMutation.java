@@ -60,7 +60,7 @@ public class CQLMutation extends AbstractCassandraMutation {
      * @return
      */
     @Override
-    protected String getResourceName() {
+    public String getResourceName() {
         return ressource;
     }
 

@@ -1,9 +1,3 @@
-/**
- * Copyright 2010-2014 Restlet S.A.S. All rights reserved.
- * 
- * Restlet and APISpark are registered trademarks of Restlet S.A.S.
- */
-
 package com.toddfast.mutagen.cassandra.impl;
 
 import java.io.ByteArrayOutputStream;
@@ -18,20 +12,14 @@ import org.slf4j.LoggerFactory;
 import com.datastax.driver.core.Session;
 import com.toddfast.mutagen.cassandra.AbstractCassandraMutation;
 
-/**
- * Base classe for cassandra migration tool.
- * 
- * @author thboileau
- * 
- */
-public abstract class NewCassandraMigrator extends AbstractCassandraMutation {
+public abstract class JAVAMutation extends AbstractCassandraMutation {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(NewCassandraMigrator.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(JAVAMutation.class);
 
     /**
      * Empty constructor.
      */
-    public NewCassandraMigrator() {
+    public JAVAMutation() {
         this(null);
     }
 
@@ -41,7 +29,7 @@ public abstract class NewCassandraMigrator extends AbstractCassandraMutation {
      * @param session
      *            - session.
      */
-    public NewCassandraMigrator(Session session) {
+    public JAVAMutation(Session session) {
         super(session);
     }
 
@@ -49,17 +37,14 @@ public abstract class NewCassandraMigrator extends AbstractCassandraMutation {
     /**
      * Override to add migration code.
      */
-    // protected abstract void migrate();
-
-    // Called only by the mutagen framework
-    @Override
-    protected abstract void performMutation(Context context);
+    // @Override
+    // protected abstract void performMutation(Context context);
 
 
     @Override
     // return class name (with package hierarchy) and replace semicolons by "/" for correct version parsing
     // if using semicolons package names ending with integers will be confused with mutation state
-    protected String getResourceName() {
+    public String getResourceName() {
         String name = getClass().getName();
         return name.substring(name.lastIndexOf(".") + 1) + ".java";
     }

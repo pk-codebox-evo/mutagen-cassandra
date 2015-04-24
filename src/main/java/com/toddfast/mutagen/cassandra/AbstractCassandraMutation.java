@@ -33,7 +33,7 @@ public abstract class AbstractCassandraMutation implements Mutation<String> {
 
     private Session session; // session
 
-    private State<String> version = null;
+    private State<String> version;
     /**
      * Constructor for AbstractCassandraMutation.
      * 
@@ -42,6 +42,7 @@ public abstract class AbstractCassandraMutation implements Mutation<String> {
      */
     public AbstractCassandraMutation(Session session) {
         setSession(session);
+        version = null;
     }
 
     /**
@@ -51,9 +52,7 @@ public abstract class AbstractCassandraMutation implements Mutation<String> {
      */
     @Override
     public String toString() {
-
         return getResourceName() + "[state=" + getResultingState().getID() + "]";
-
     }
 
     /**
@@ -143,9 +142,7 @@ public abstract class AbstractCassandraMutation implements Mutation<String> {
      * 
      * @return
      */
-    protected abstract String getResourceName();
-
-
+    public abstract String getResourceName();
 
     /**
      * Performs the actual mutation and then updates the recorded schema version.
@@ -157,7 +154,7 @@ public abstract class AbstractCassandraMutation implements Mutation<String> {
 
         LOGGER.trace("Entering mutate(context={})", context);
 
-        MutagenException runtimeException = null;
+        MutagenException mutagenException = null;
         // Perform the mutation
         boolean success = true;
         long startTime = System.currentTimeMillis();
@@ -168,7 +165,7 @@ public abstract class AbstractCassandraMutation implements Mutation<String> {
 
         } catch (MutagenException e) {
             success = false;
-            runtimeException = e;
+            mutagenException = e;
         }
 
 
@@ -181,15 +178,12 @@ public abstract class AbstractCassandraMutation implements Mutation<String> {
         String checksum = getChecksum();
 
         // append version record
-        if (success) {
-            DBUtils.appendVersionRecord(session, version, getResourceName(), checksum, (int) execution_time, "Success");
-        }
-        else {
-            DBUtils.appendVersionRecord(session, version, getResourceName(), checksum, (int) execution_time, "Failed");
-        }
+        DBUtils.appendVersionRecord(session, version, getResourceName(), checksum, (int) execution_time,
+                    (success ? "Success" : "Failed"));
 
-        if (runtimeException != null)
-            throw runtimeException;
+        if (mutagenException != null) {
+            throw mutagenException;
+        }
 
         LOGGER.trace("Leaving mutate()");
 
@@ -264,22 +258,4 @@ public abstract class AbstractCassandraMutation implements Mutation<String> {
 
         return hexString.toString();
     }
-
-    /**
-     * baseline execution.
-     */
-    public void dummyExecution(String baselineVersion) {
-        String version = getResultingState().getID();
-
-        // caculate the checksum
-        String checksum = getChecksum();
-
-        // append version record
-        if (version.compareTo(baselineVersion) < 0) {
-            DBUtils.appendVersionRecord(session, version, getResourceName(), checksum, 0, "<Baseline");
-        } else if (version.compareTo(baselineVersion) == 0) {
-            DBUtils.appendVersionRecord(session, version, getResourceName(), checksum, 0, "Baseline");
-        }
-    }
-    
 }

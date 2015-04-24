@@ -1,8 +1,8 @@
 package mutations.tests.simple.java;
 
-import com.toddfast.mutagen.cassandra.impl.NewCassandraMigrator;
+import com.toddfast.mutagen.cassandra.impl.JAVAMutation;
 
-public class M201502011200_CreateTableTest_1000 extends NewCassandraMigrator {
+public class M201502011200_CreateTableTest_1000 extends JAVAMutation {
     @Override
     protected void performMutation(com.toddfast.mutagen.Mutation.Context context) {
         getSession().execute("CREATE TABLE \"Test1\" (key varchar PRIMARY KEY,value1 varchar);");

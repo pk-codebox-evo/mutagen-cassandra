@@ -2,14 +2,14 @@ package mutations.tests.wrongJavaScript;
 
 
 import com.toddfast.mutagen.MutagenException;
-import com.toddfast.mutagen.cassandra.impl.NewCassandraMigrator;
+import com.toddfast.mutagen.cassandra.impl.JAVAMutation;
 
 /**
  *
  * It is a script file java with wrong cql statements.
  * 
  */
-public class M201502011225_WrongJavaScriptFile_1111 extends NewCassandraMigrator {
+public class M201502011225_WrongJavaScriptFile_1111 extends JAVAMutation {
 
     @Override
     protected void performMutation(Context context) {
