@@ -22,7 +22,6 @@ public class UnexpectedNewMigrationTest extends AbstractTest {
         // try to mutate with script ending in 1
         mutate("mutations/tests/unexpected_new_migration");
 
-
     }
 
 }
