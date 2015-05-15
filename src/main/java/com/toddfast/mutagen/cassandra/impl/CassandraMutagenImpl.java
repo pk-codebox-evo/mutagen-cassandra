@@ -105,6 +105,33 @@ public class CassandraMutagenImpl extends CassandraMutagen {
 
     }
 
+    @Override
+    public Plan.Result<String> migrate(String path) {
+        this.setLocation(path);
+        // load migration scripts
+        try {
+            this.initialize();
+        } catch (IOException e) {
+            throw new RuntimeException("Can not load scripts");
+        }
+        // migrate
+        Plan.Result<String> result = null;
+        try {
+            result = this.mutate();
+        } catch (Exception e) {
+            System.out.println("ERROR:" + e.getMessage());
+        }
+
+        return result;
+    }
+
+    @Override
+    public Plan.Result<String> withInitScript(String path) {
+        Plan.Result<String> result = this.migrate(path);
+        this.clean();
+
+        return result;
+    }
     /**
      * Drop version table.
      */

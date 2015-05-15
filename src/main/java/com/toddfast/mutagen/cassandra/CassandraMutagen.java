@@ -57,6 +57,18 @@ public abstract class CassandraMutagen {
     public abstract Plan.Result<String> mutate();
 
     /**
+     * @return
+     *         the result of migration of all the scripts.
+     */
+    public abstract Plan.Result<String> migrate(String path);
+
+    /**
+     * @return
+     *         the result of migration of all the scripts.
+     */
+    public abstract Plan.Result<String> withInitScript(String path);
+
+    /**
      * Baseline.
      */
     public abstract void baseline();
