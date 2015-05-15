@@ -1,7 +1,5 @@
 package com.toddfast.mutagen.cassandra.impl;
 
-import java.io.IOException;
-
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -21,13 +19,9 @@ public class MigrationInfoTest extends AbstractTest {
     public void migrationInfoWithFailedScriptTest() {
         CassandraMutagenImpl mutagen = new CassandraMutagenImpl(getSession());
         MigrationInfoService migrationService = mutagen.info();
-        try {
-            mutagen.setLocation("mutations/tests/failed_mutation");
-            mutagen.initialize();
-        } catch (IOException e) {
 
-        }
-        mutagen.mutate();
+        mutagen.migrate("mutations/tests/failed_mutation");
+
         migrationService.refresh();
         Assert.assertEquals(migrationService.current().getFilename(), "M201507010001_WrongCqlScriptFile_1111.cqlsh.txt");
     }
@@ -36,13 +30,9 @@ public class MigrationInfoTest extends AbstractTest {
     public void migrationInfoWithNoFailedScriptTest() {
         CassandraMutagen mutagen = new CassandraMutagenImpl(getSession());
         MigrationInfoService migrationService = mutagen.info();
-        try {
-            mutagen.setLocation("mutations/tests/execution");
-            mutagen.initialize();
-        } catch (IOException e) {
 
-        }
-        mutagen.mutate();
+        mutagen.migrate("mutations/tests/execution");
+
         migrationService.refresh();
 
         Assert.assertEquals(migrationService.failed(), null);

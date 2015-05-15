@@ -48,25 +48,31 @@ public abstract class CassandraMutagen {
      * 
      * @return mutations plan
      */
-    public abstract Plan<String> getMutationsPlan();
+    public abstract Plan<String> getMutationsPlan(boolean ignoreDB);
 
     /**
      * @return
      *         the result of migration of all the scripts.
      */
-    public abstract Plan.Result<String> mutate();
+    public abstract Plan.Result<String> mutate(boolean ignoreDB);
 
     /**
      * @return
      *         the result of migration of all the scripts.
      */
-    public abstract Plan.Result<String> migrate(String path);
+    public abstract Plan.Result<String> migrate(String path, boolean ignoreDB);
 
     /**
      * @return
      *         the result of migration of all the scripts.
      */
     public abstract Plan.Result<String> withInitScript(String path);
+
+    /**
+     * @return
+     *         the result of migration of all the scripts.
+     */
+    public abstract Plan.Result<String> migrate(String path);
 
     /**
      * Baseline.

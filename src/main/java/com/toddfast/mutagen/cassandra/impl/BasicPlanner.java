@@ -16,6 +16,7 @@ import com.toddfast.mutagen.Planner;
 import com.toddfast.mutagen.State;
 import com.toddfast.mutagen.Subject;
 import com.toddfast.mutagen.basic.BasicContext;
+import com.toddfast.mutagen.cassandra.AbstractCassandraMutation;
 
 /**
  * Generates basic plans using the initial list of mutations and the specified
@@ -97,6 +98,9 @@ public class BasicPlanner<I extends Comparable<I>> implements Planner<I> {
             mutation = i.next();
 
             try {
+                if (mutation instanceof AbstractCassandraMutation) {
+                    ((AbstractCassandraMutation) mutation).setIgnoreDB(isIgnoreDB());
+                }
                 mutation.mutate(context);
                 lastState = mutation.getResultingState();
 
@@ -131,6 +135,14 @@ public class BasicPlanner<I extends Comparable<I>> implements Planner<I> {
 
     public List<Mutation<I>> getMutations() {
         return mutations;
+    }
+
+    public boolean isIgnoreDB() {
+        return ignoreDB;
+    }
+
+    public void setIgnoreDB(boolean ignoreDB) {
+        this.ignoreDB = ignoreDB;
     }
 
     // //////////////////////////////////////////////////////////////////////////
@@ -242,4 +254,6 @@ public class BasicPlanner<I extends Comparable<I>> implements Planner<I> {
 
 
     private List<Mutation<I>> mutations;
+
+    private boolean ignoreDB;
 }

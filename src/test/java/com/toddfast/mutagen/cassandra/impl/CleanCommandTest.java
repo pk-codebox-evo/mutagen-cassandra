@@ -17,13 +17,7 @@ public class CleanCommandTest extends AbstractTest {
         // Instanciate mutagen
         CassandraMutagen mutagen = new CassandraMutagenImpl(getSession());
 
-        // Use working case for test
-        mutagen.setLocation("mutations/tests/execution");
-        mutagen.initialize();
-
-        // mutate
-        mutagen.mutate();
-
+        mutagen.migrate("mutations/tests/execution");
         // Clean
         mutagen.clean();
 

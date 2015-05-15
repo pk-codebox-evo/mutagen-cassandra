@@ -5,8 +5,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import info.archinnov.achilles.junit.AchillesResourceBuilder;
 
-import java.io.IOException;
-
 import org.junit.Before;
 
 import com.datastax.driver.core.BoundStatement;
@@ -52,14 +50,7 @@ public abstract class AbstractTest {
         // Get an instance of CassandraMutagen
         CassandraMutagen mutagen = new CassandraMutagenImpl(session);
         // Initialize the list of mutations
-        try {
-            mutagen.setLocation(path);
-            mutagen.initialize();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        // Mutate!
-        result = mutagen.mutate();
+        result = mutagen.migrate(path);
     }
 
     /**

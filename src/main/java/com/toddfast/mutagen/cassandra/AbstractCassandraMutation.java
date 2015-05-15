@@ -34,6 +34,8 @@ public abstract class AbstractCassandraMutation implements Mutation<String> {
     private Session session; // session
 
     private State<String> version;
+
+    private boolean ignoreDB;
     /**
      * Constructor for AbstractCassandraMutation.
      * 
@@ -178,9 +180,10 @@ public abstract class AbstractCassandraMutation implements Mutation<String> {
         String checksum = getChecksum();
 
         // append version record
+        if (!isIgnoreDB()) {
         DBUtils.appendVersionRecord(session, version, getResourceName(), checksum, (int) execution_time,
                     (success ? "Success" : "Failed"));
-
+        }
         if (mutagenException != null) {
             throw mutagenException;
         }
@@ -257,5 +260,13 @@ public abstract class AbstractCassandraMutation implements Mutation<String> {
         }
 
         return hexString.toString();
+    }
+
+    public boolean isIgnoreDB() {
+        return ignoreDB;
+    }
+
+    public void setIgnoreDB(boolean ignoreDB) {
+        this.ignoreDB = ignoreDB;
     }
 }

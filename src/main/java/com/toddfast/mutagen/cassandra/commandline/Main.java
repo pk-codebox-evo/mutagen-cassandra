@@ -62,8 +62,8 @@ public class Main {
             loadResources(mutagen);
             mutagen.baseline();
         } else if ("migrate".equals(operation)) {
-            loadResources(mutagen);
-            Result<String> mutationResult = mutagen.mutate();
+            String location = setLocation(mutagen);
+            Result<String> mutationResult = mutagen.migrate(location);
 
             showMigrationResults(mutationResult);
             if (mutationResult.getException() != null) {
@@ -151,24 +151,31 @@ public class Main {
      */
     private static void loadResources(CassandraMutagen mutagen) {
         try {
-            String location = mutagen.getLocation();
-            if (location == null) {
-                return;
-            }
-            if (location.lastIndexOf("/") == location.length() - 1) {
-                location = location.substring(0, location.length() - 1);
-            }
-            if (location.lastIndexOf("/") > 0) {
-                location = location.substring(location.lastIndexOf("/") + 1, location.length());
-            }
-
-            mutagen.setLocation(location);
-
+            setLocation(mutagen);
             mutagen.initialize();
         } catch (IOException e) {
             LOGGER.error("Can not load resources");
             throw new RuntimeException("Can not load resources");
         }
+    }
+
+    /**
+     * @param mutagen
+     */
+    private static String setLocation(CassandraMutagen mutagen) {
+        String location = mutagen.getLocation();
+        if (location == null) {
+            throw new IllegalArgumentException("no location");
+        }
+        if (location.lastIndexOf("/") == location.length() - 1) {
+            location = location.substring(0, location.length() - 1);
+        }
+        if (location.lastIndexOf("/") > 0) {
+            location = location.substring(location.lastIndexOf("/") + 1, location.length());
+        }
+
+        mutagen.setLocation(location);
+        return location;
     }
 
     /**

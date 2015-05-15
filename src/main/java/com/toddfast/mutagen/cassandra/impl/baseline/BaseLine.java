@@ -36,7 +36,7 @@ public class BaseLine {
     // Dummy execution of all mutations with state inferior of equal to lastCompletedState
     private void dummyPlanExecution() {
 
-        for (Mutation<String> m : getMutagen().getMutationsPlan().getMutations()) {
+        for (Mutation<String> m : getMutagen().getMutationsPlan(false).getMutations()) {
             try {
                 dummyExecution((AbstractCassandraMutation) m);
             } catch (Exception e) {

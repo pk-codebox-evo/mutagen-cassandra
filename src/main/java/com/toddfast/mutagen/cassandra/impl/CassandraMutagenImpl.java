@@ -10,7 +10,6 @@ import com.datastax.driver.core.Session;
 import com.toddfast.mutagen.MutagenException;
 import com.toddfast.mutagen.Plan;
 import com.toddfast.mutagen.Plan.Result;
-import com.toddfast.mutagen.Planner;
 import com.toddfast.mutagen.cassandra.CassandraCoordinator;
 import com.toddfast.mutagen.cassandra.CassandraMutagen;
 import com.toddfast.mutagen.cassandra.CassandraSubject;
@@ -68,13 +67,14 @@ public class CassandraMutagenImpl extends CassandraMutagen {
      * 
      * @return mutations plan
      */
-    public Plan<String> getMutationsPlan() {
+    public Plan<String> getMutationsPlan(boolean ignoreDB) {
         LOGGER.trace("Entering getMutationsPlan(session={})", getSession());
         CassandraCoordinator coordinator = new CassandraCoordinator(getSession());
         CassandraSubject subject = new CassandraSubject(getSession());
 
-        Planner<String> planner =
+        CassandraPlanner planner =
                 new CassandraPlanner(getSession(), getResources());
+        planner.setIgnoreDB(ignoreDB);
         Plan<String> plan = planner.getPlan(subject, coordinator);
 
         LOGGER.trace("Leaving getMutationsPlan(session={})", getSession());
@@ -88,7 +88,7 @@ public class CassandraMutagenImpl extends CassandraMutagen {
      *         the results of migration.
      */
     @Override
-    public Plan.Result<String> mutate() {
+    public Plan.Result<String> mutate(boolean ignoreDB) {
         LOGGER.trace("Entering mutate(session={})", getSession());
         Result<String> mutationsResult;
 
@@ -96,7 +96,7 @@ public class CassandraMutagenImpl extends CassandraMutagen {
         // Do this in a VM-wide critical section. External cluster-wide
         // synchronization is going to have to happen in the coordinator.
         synchronized (System.class) {
-            Plan<String> plan = getMutationsPlan();
+            Plan<String> plan = getMutationsPlan(ignoreDB);
             mutationsResult = plan.execute();
         }
 
@@ -106,7 +106,7 @@ public class CassandraMutagenImpl extends CassandraMutagen {
     }
 
     @Override
-    public Plan.Result<String> migrate(String path) {
+    public Plan.Result<String> migrate(String path, boolean ignoreDB) {
         this.setLocation(path);
         // load migration scripts
         try {
@@ -117,7 +117,7 @@ public class CassandraMutagenImpl extends CassandraMutagen {
         // migrate
         Plan.Result<String> result = null;
         try {
-            result = this.mutate();
+            result = this.mutate(ignoreDB);
         } catch (Exception e) {
             System.out.println("ERROR:" + e.getMessage());
         }
@@ -127,9 +127,14 @@ public class CassandraMutagenImpl extends CassandraMutagen {
 
     @Override
     public Plan.Result<String> withInitScript(String path) {
-        Plan.Result<String> result = this.migrate(path);
-        this.clean();
+        Plan.Result<String> result = this.migrate(path, true);
 
+        return result;
+    }
+
+    @Override
+    public Plan.Result<String> migrate(String path) {
+        Plan.Result<String> result = this.migrate(path, false);
         return result;
     }
     /**
