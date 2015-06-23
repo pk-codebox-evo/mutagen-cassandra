@@ -33,6 +33,7 @@ public class CassandraMutagenImpl extends CassandraMutagen {
     public CassandraMutagenImpl(Session session) {
         super(session);
     }
+
     /**
      * Loads the resources.
      * 
@@ -49,19 +50,19 @@ public class CassandraMutagenImpl extends CassandraMutagen {
      */
     @Override
     public void configure(Properties properties) {
+        // get baseline
         String baselineVersion = properties.getProperty("baselineVersion");
-
         if (baselineVersion != null) {
             setBaselineVersion(baselineVersion);
         }
-
+        // get location
         String location = properties.getProperty("location");
-
         if (location != null) {
             setLocation(location);
         }
 
     }
+
     /**
      * Retrive a plan of mutations.
      * 
@@ -92,7 +93,6 @@ public class CassandraMutagenImpl extends CassandraMutagen {
         LOGGER.trace("Entering mutate(session={})", getSession());
         Result<String> mutationsResult;
 
-
         // Do this in a VM-wide critical section. External cluster-wide
         // synchronization is going to have to happen in the coordinator.
         synchronized (System.class) {
@@ -103,6 +103,13 @@ public class CassandraMutagenImpl extends CassandraMutagen {
         LOGGER.trace("Leaving mutate()", mutationsResult);
         return mutationsResult;
 
+    }
+
+    @Override
+    public Plan.Result<String> migrate(String path) {
+        Plan.Result<String> result = this.migrate(path, false);
+
+        return result;
     }
 
     @Override
@@ -132,11 +139,6 @@ public class CassandraMutagenImpl extends CassandraMutagen {
         return result;
     }
 
-    @Override
-    public Plan.Result<String> migrate(String path) {
-        Plan.Result<String> result = this.migrate(path, false);
-        return result;
-    }
     /**
      * Drop version table.
      */
@@ -147,7 +149,6 @@ public class CassandraMutagenImpl extends CassandraMutagen {
         DBUtils.dropSchemaVersionTable(getSession());
 
         System.out.println("Done");
-
 
     }
 
@@ -196,6 +197,6 @@ public class CassandraMutagenImpl extends CassandraMutagen {
         if (migrationInfoService == null) {
             migrationInfoService = new MigrationInfoServiceImpl(getSession());
         }
-            return migrationInfoService;
+        return migrationInfoService;
     }
 }
