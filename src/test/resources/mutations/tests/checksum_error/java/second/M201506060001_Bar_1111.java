@@ -1,8 +1,8 @@
 package mutations.tests.checksum_error.java.second;
 
-import com.toddfast.mutagen.cassandra.impl.JAVAMutation;
+import com.toddfast.mutagen.cassandra.impl.JavaMutation2;
 
-public class M201506060001_Bar_1111 extends JAVAMutation {
+public class M201506060001_Bar_1111 extends JavaMutation2 {
 
     @Override
     protected void performMutation(com.toddfast.mutagen.Mutation.Context context) {

@@ -1,8 +1,11 @@
 package com.toddfast.mutagen.cassandra;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,9 +28,7 @@ public abstract class AbstractCassandraMutation implements Mutation<String> {
     // //////////////////////////////////////////////////////////////////////////
     // Fields
     // //////////////////////////////////////////////////////////////////////////
-    private final static String fileSeparator = "/"; // file separator
-
-    private final static String cqlMigrationSeparator = "_"; // script separator
+    private final static String VERSION_PATTERN = "M(\\d{12})_.*";;
 
     private static Logger LOGGER = LoggerFactory.getLogger(AbstractCassandraMutation.class);
 
@@ -72,43 +73,23 @@ public abstract class AbstractCassandraMutation implements Mutation<String> {
     protected final State<String> parseVersion(String resourceName) {
         LOGGER.trace("Entering parseVersion(resourceName={})", resourceName);
 
-        String versionString = resourceName;
-        int index = versionString.lastIndexOf(fileSeparator);
-        if (versionString.lastIndexOf(fileSeparator) != -1) {
-            versionString = versionString.substring(index + 1);
+        String filename = Paths.get(resourceName).getFileName().toString();
+        Matcher matcher = Pattern.compile(VERSION_PATTERN).matcher(filename);
+        if (!matcher.matches()) {
+            throw new IllegalArgumentException("Resource name [" + filename + "] does not match with pattern [" + VERSION_PATTERN + "] for extracting version");
         }
 
-        index = versionString.lastIndexOf(cqlMigrationSeparator);
-        if (index != -1) {
-            versionString = versionString.substring(0, index);
-        }
+        String version = matcher.group(1);
+        LOGGER.trace("Leaving parseVersion() : {}", version);
 
-        StringBuilder buffer = new StringBuilder();
-        for (Character c : versionString.toCharArray()) {
-            // Skip all initial non-digit characters
-            if (!Character.isDigit(c)) {
-                if (buffer.length() == 0) {
-                    continue;
-                }
-                else {
-                    // End when we reach the first non-digit
-                    break;
-                }
-            }
-            else {
-                buffer.append(c);
-            }
-        }
-        LOGGER.trace("Leaving parseVersion() : {}", buffer);
-
-        return new SimpleState<String>(buffer.toString());
+        return new SimpleState<>(version);
     }
 
     /**
      * Override to perform the actual mutation.
      * 
      * @param context
-     *            Logs to {@link System.out} and {@link System.err}
+     *            Logs to {@link System#out} and {@link System#err}
      */
     protected abstract void performMutation(Context context);
 
@@ -131,7 +112,6 @@ public abstract class AbstractCassandraMutation implements Mutation<String> {
     /**
      * Override to get the name of resource.
      * 
-     * @return
      */
     public abstract String getResourceName();
 
@@ -210,8 +190,8 @@ public abstract class AbstractCassandraMutation implements Mutation<String> {
             throw new RuntimeException(ex);
         }
 
-        byte[] messageDigest = algorithm.digest();
-        return messageDigest;
+        //messageDigest
+        return algorithm.digest();
     }
 
     /**
@@ -237,9 +217,9 @@ public abstract class AbstractCassandraMutation implements Mutation<String> {
      */
     public static String toHex(byte[] bytes) {
         StringBuilder hexString = new StringBuilder();
-        for (int i = 0; i < bytes.length; i++) {
+        for (byte aByte : bytes) {
 
-            String hex = Integer.toHexString(0xFF & bytes[i]);
+            String hex = Integer.toHexString(0xFF & aByte);
             if (hex.length() == 1) {
                 hexString.append('0');
             }
@@ -252,8 +232,6 @@ public abstract class AbstractCassandraMutation implements Mutation<String> {
 
     /**
      * A getter method for session.
-     * 
-     * @return
      */
     protected Session getSession() {
         return session;

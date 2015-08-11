@@ -73,8 +73,7 @@ public class CassandraMutagenImpl extends CassandraMutagen {
         CassandraCoordinator coordinator = new CassandraCoordinator(getSession());
         CassandraSubject subject = new CassandraSubject(getSession());
 
-        CassandraPlanner planner =
-                new CassandraPlanner(getSession(), getResources());
+        CassandraPlanner planner = new CassandraPlanner(getSession(), getResources());
         planner.setIgnoreDB(ignoreDB);
         Plan<String> plan = planner.getPlan(subject, coordinator);
 

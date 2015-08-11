@@ -2,6 +2,7 @@ package com.toddfast.mutagen.cassandra.impl;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -29,6 +30,8 @@ import com.toddfast.mutagen.cassandra.util.DBUtils;
 public class CassandraPlanner extends BasicPlanner<String> {
 
     private static Logger LOGGER = LoggerFactory.getLogger(CassandraPlanner.class);
+
+    private final static String FILENAME_PATTERN = "M\\d{12}_[\\w\\d\\-]+_[\\w\\d\\-]+\\.(class|cqlsh\\.txt)";
 
     private Session session;
 
@@ -62,27 +65,31 @@ public class CassandraPlanner extends BasicPlanner<String> {
 
         LOGGER.trace("Entering loadMutations(session={}, resources={})", session, resources);
 
-        List<Mutation<String>> result = new ArrayList<Mutation<String>>();
+        List<Mutation<String>> result = new ArrayList<>();
 
         for (String resource : resources) {
-            // check name of script file
-            if (!validate(resource)) {
-                throw new IllegalArgumentException("wrong name for " +
-                        "mutation resource \"" + resource + "\"");
-            }
+
             // Allow .sql files because some editors have syntax highlighting
             // for SQL but not CQL
             if (resource.endsWith(".cqlsh.txt") || resource.endsWith(".sql")) {
-                result.add(
-                        new CQLMutation(session, resource));
+                result.add(new CqlMutation2(session, resource));
             }
             else if (resource.endsWith(".class")) {
-                result.add(
-                        loadMutationClass(session, resource));
+                result.add(loadMutationClass(session, resource));
             } else if (resource.endsWith(".java")) {
                 // ignore java file
+                if (!hasJavaFileAssociatedClassFile(resource, resources)) {
+                    throw new IllegalArgumentException("Java file found without corresponding class file for resource \"" + resource + "\".");
+                }
+                continue;
             } else {
-                throw new IllegalArgumentException("Unknown type for " +
+                throw new IllegalArgumentException("Unknown type for resource \"" + resource + "\".");
+            }
+
+
+            // check name of script file
+            if (!validate(resource)) {
+                throw new IllegalArgumentException("wrong name for " +
                         "mutation resource \"" + resource + "\"");
             }
         }
@@ -92,6 +99,17 @@ public class CassandraPlanner extends BasicPlanner<String> {
         LOGGER.trace("Leaving loadMutations() : {}", result);
 
         return result;
+    }
+
+    private static boolean hasJavaFileAssociatedClassFile(String javaResource, Collection<String> resources) {
+        String classResource = javaResource.replaceAll("(.*)java", "$1class");
+        for (String resource : resources) {
+            if (resource.equals(classResource)) {
+                return true;
+            }
+        }
+        return false;
+//        String classResource = javaResource.substring(0, javaResource.length() - "java".length()) + "class";
     }
 
     /**
@@ -104,7 +122,7 @@ public class CassandraPlanner extends BasicPlanner<String> {
 
         LOGGER.trace("checking for duplicate resource states");
         // store all states as string
-        List<String> states = new ArrayList<String>();
+        List<String> states = new ArrayList<>();
 
         for (Mutation<String> m : mutations) {
             states.add(m.getResultingState().getID());
@@ -133,12 +151,8 @@ public class CassandraPlanner extends BasicPlanner<String> {
      * @return
      */
     private static boolean validate(String resource) {
-        String pattern = "^M(\\d{12})_([a-zA-z]+)(.*)\\.((java)|(class)|(cqlsh\\.txt))$"; // convention of script
-        // file
-        String fileSeparator = "/"; // file separator
-        String resourceName = resource.substring(resource.lastIndexOf(fileSeparator) + 1);
-
-        return resourceName.matches(pattern);
+        String filename = Paths.get(resource).getFileName().toString();
+        return filename.matches(FILENAME_PATTERN);
     }
 
     /**
@@ -147,8 +161,7 @@ public class CassandraPlanner extends BasicPlanner<String> {
      * @return
      *         mutation for script file end with .class
      */
-    private static Mutation<String> loadMutationClass(
-            Session session, String resource) {
+    private static Mutation<String> loadMutationClass(Session session, String resource) {
 
         LOGGER.trace("Entering loadMutationClass(session={}, resource={})", session, resource);
 
@@ -158,19 +171,18 @@ public class CassandraPlanner extends BasicPlanner<String> {
         String className = resource.substring(0, index).replace('/', '.');
 
         // Load the class specified by the resource
-        Class<?> clazz = null;
+        Class<?> clazz;
         try {
             clazz = Class.forName(className);
         } catch (ClassNotFoundException e) {
             // Should never happen
-            throw new MutagenException("Could not load mutagen class \"" +
-                    resource + "\"", e);
+            throw new MutagenException("Could not load mutagen class \"" + resource + "\"", e);
         }
 
         // Instantiate the class
         try {
             Constructor<?> constructor;
-            Mutation<String> mutation = null;
+            Mutation<String> mutation;
             try {
                 LOGGER.debug("Instanciating {}", clazz);
 
@@ -190,19 +202,15 @@ public class CassandraPlanner extends BasicPlanner<String> {
 
             return mutation;
         } catch (InstantiationException e) {
-            throw new MutagenException("Could not instantiate class \"" +
-                    className + "\"", e);
+            throw new MutagenException("Could not instantiate class \"" + className + "\"", e);
         } catch (InvocationTargetException e) {
             if (e.getTargetException() instanceof RuntimeException) {
                 throw (RuntimeException) e.getTargetException();
-            }
-            else {
-                throw new MutagenException("Exception instantiating class \"" +
-                        className + "\"", e);
+            } else {
+                throw new MutagenException("Exception instantiating class \"" + className + "\"", e);
             }
         } catch (IllegalAccessException e) {
-            throw new MutagenException("Could not access constructor for " +
-                    "mutation class \"" + className + "\"", e);
+            throw new MutagenException("Could not access constructor for " + "mutation class \"" + className + "\"", e);
         }
     }
 

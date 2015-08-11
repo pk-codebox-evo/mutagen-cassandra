@@ -1,9 +1,9 @@
 package mutations.tests.failed_mutation;
 
-import com.toddfast.mutagen.cassandra.impl.JAVAMutation;
+import com.toddfast.mutagen.cassandra.impl.JavaMutation2;
 
 // First script, successful
-public class M201506060001_Bar_1111 extends JAVAMutation {
+public class M201506060001_Bar_1111 extends JavaMutation2 {
 
     @Override
     protected void performMutation(com.toddfast.mutagen.Mutation.Context context) {

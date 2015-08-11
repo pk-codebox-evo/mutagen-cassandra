@@ -90,7 +90,7 @@ public class LoadResources {
      * @throws IOException
      */
     public static List<String> loadResources(CassandraMutagen mutagen, String rootResourcePath) throws IOException {
-        List<String> resources = new ArrayList<String>();
+        List<String> resources = new ArrayList<>();
         try {
             List<String> discoveredResources =
                     ResourceScanner.getInstance().getResources(
@@ -109,10 +109,9 @@ public class LoadResources {
             for (String resource : discoveredResources) {
                 log.info("Found mutation resource \"{}\"", resource);
 
-                if (resource.endsWith(".class")) {
+                if (resource.endsWith(".class") || resource.endsWith(".java")) {
                     // Remove the file path
-                    resource = resource.substring(
-                            resource.indexOf(rootResourcePath));
+                    resource = resource.substring(resource.indexOf(rootResourcePath));
                     if (resource.contains("$")) {
                         // skip inner classes
                         continue;

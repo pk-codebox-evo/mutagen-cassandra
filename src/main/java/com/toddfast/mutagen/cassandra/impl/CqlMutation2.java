@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +19,7 @@ import com.toddfast.mutagen.cassandra.AbstractCassandraMutation;
 /**
  * Generate the mutation for the script file end with cqlsh.txt.
  */
-public class CQLMutation extends AbstractCassandraMutation {
+public class CqlMutation2 extends AbstractCassandraMutation {
 
     /**
      * constructor for CQLMutation.
@@ -28,10 +29,9 @@ public class CQLMutation extends AbstractCassandraMutation {
      * @param resourceName
      *            name of script file end with cqlsh.txt.
      */
-    public CQLMutation(Session session, String resourceName) {
+    public CqlMutation2(Session session, String resourceName) {
         super(session);
-        this.ressource = resourceName.substring(resourceName
-                .lastIndexOf("/") + 1);
+        this.ressource = Paths.get(resourceName).getFileName().toString();
         loadCQLStatements(resourceName);
     }
 
@@ -129,8 +129,7 @@ public class CQLMutation extends AbstractCassandraMutation {
      *         the content of resource
      *
      */
-    public String loadResource(String path)
-            throws IOException {
+    public String loadResource(String path) throws IOException {
 
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
         if (loader == null) {
@@ -146,8 +145,7 @@ public class CQLMutation extends AbstractCassandraMutation {
         }
 
         if (input == null) {
-            throw new IllegalArgumentException("Resource \"" +
-                    path + "\" not found");
+            throw new IllegalArgumentException("Resource \"" + path + "\" not found");
         }
 
         try {
@@ -155,9 +153,7 @@ public class CQLMutation extends AbstractCassandraMutation {
             return loadResource(input);
         } finally {
             try {
-                if (input != null) {
-                    input.close();
-                }
+                input.close();
             } catch (IOException e) {
                 // Ignore
             }
