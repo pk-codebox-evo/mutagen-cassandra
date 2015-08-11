@@ -12,14 +12,14 @@ import org.slf4j.LoggerFactory;
 import com.datastax.driver.core.Session;
 import com.toddfast.mutagen.cassandra.AbstractCassandraMutation;
 
-public abstract class JavaMutation2 extends AbstractCassandraMutation {
+public abstract class JavaMutation extends AbstractCassandraMutation {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(JavaMutation2.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(JavaMutation.class);
 
     /**
      * Empty constructor.
      */
-    public JavaMutation2() {
+    public JavaMutation() {
         this(null);
     }
 
@@ -29,7 +29,7 @@ public abstract class JavaMutation2 extends AbstractCassandraMutation {
      * @param session
      *            - session.
      */
-    public JavaMutation2(Session session) {
+    public JavaMutation(Session session) {
         super(session);
     }
 

@@ -2,13 +2,13 @@ package mutations.tests.execution;
 
 
 import com.toddfast.mutagen.MutagenException;
-import com.toddfast.mutagen.cassandra.impl.JavaMutation2;
+import com.toddfast.mutagen.cassandra.impl.JavaMutation;
 
 /**
  *
  * It is a script file java that update table Test1.
  */
-public class M201502011225_UpdateTableTest_1111 extends JavaMutation2 {
+public class M201502011225_UpdateTableTest_1111 extends JavaMutation {
 
 
 

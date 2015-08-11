@@ -19,7 +19,7 @@ import com.toddfast.mutagen.cassandra.AbstractCassandraMutation;
 /**
  * Generate the mutation for the script file end with cqlsh.txt.
  */
-public class CqlMutation2 extends AbstractCassandraMutation {
+public class CqlMutation extends AbstractCassandraMutation {
 
     /**
      * constructor for CQLMutation.
@@ -29,7 +29,7 @@ public class CqlMutation2 extends AbstractCassandraMutation {
      * @param resourceName
      *            name of script file end with cqlsh.txt.
      */
-    public CqlMutation2(Session session, String resourceName) {
+    public CqlMutation(Session session, String resourceName) {
         super(session);
         this.ressource = Paths.get(resourceName).getFileName().toString();
         loadCQLStatements(resourceName);

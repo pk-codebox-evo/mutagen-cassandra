@@ -72,7 +72,7 @@ public class CassandraPlanner extends BasicPlanner<String> {
             // Allow .sql files because some editors have syntax highlighting
             // for SQL but not CQL
             if (resource.endsWith(".cqlsh.txt") || resource.endsWith(".sql")) {
-                result.add(new CqlMutation2(session, resource));
+                result.add(new CqlMutation(session, resource));
             }
             else if (resource.endsWith(".class")) {
                 result.add(loadMutationClass(session, resource));
