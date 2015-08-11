@@ -103,20 +103,7 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-    <!-- phase deploy -->
-    <!-- <distributionManagement>
-        <repository>
-            <id>nexus-releases</id>
-            <name>Nexus Release Repository</name>
-            <url>http://54.148.243.109:8081/nexus/content/repositories/releases/</url>
-        </repository>
-        <snapshotRepository>
-            <id>nexus-snapshots</id>
-            <name>Nexus Snapshot Repository</name>
-            <url>http://54.148.243.109:8081/nexus/content/repositories/snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement>
- -->
+
     <build>
         <plugins>
             <plugin>
