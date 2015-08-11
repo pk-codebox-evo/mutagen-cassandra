@@ -7,6 +7,12 @@ Mutagen is a lightweight framework for applying versioned changes (known as *mut
 
 Schema mutation with Mutagen helps you make manageable changes to the schema of live Cassandra instances as you update your software, and is especially useful when used across development, test, staging, and production environments to automatically keep schemas in sync.
 
+IDE configuration
+---------------
+
+Configure `test/resources/` directory as a test source folder (not a test resource folder) since test/resources directory contains java files which need to be compiled.
+Maven do it with the `build-helper-maven-plugin` plugin.
+
 Getting Started
 ---------------
 

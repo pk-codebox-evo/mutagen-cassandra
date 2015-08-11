@@ -20,7 +20,9 @@ public class MigrationOrderTest extends AbstractTest {
         mutate("mutations/tests/execution");
 
         // Get the mutations executed
-        List<String> mutations = new ArrayList<String>();
+        assertEquals(4, result.getCompletedMutations().size());
+
+        List<String> mutations = new ArrayList<>();
         for (Mutation<String> mutation : result.getCompletedMutations()) {
             mutations.add(mutation.getResultingState().getID());
         }
