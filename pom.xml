@@ -1,10 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.restlet</groupId>
     <artifactId>mutagen-cassandra</artifactId>
-    <version>0.1.2-SNAPSHOT</version>
+    <version>0.1.2</version>
     <packaging>jar</packaging>
 
     <name>toddfast-mutagen-cassandra</name>
@@ -18,7 +17,7 @@
         <url>https://github.com/restlet/mutagen-cassandra</url>
         <connection>scm:git:git@github.com:restlet/mutagen-cassandra.git</connection>
         <developerConnection>scm:git:git@github.com:restlet/mutagen-cassandra.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>v0.1.2</tag>
     </scm>
 
     <licenses>
@@ -166,8 +165,7 @@
                             <shadedArtifactAttached>true</shadedArtifactAttached>
                             <shadedClassifierName>one-jar</shadedClassifierName>
                             <transformers>
-                                <transformer
-                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <manifestEntries>
                                         <Main-Class>com.toddfast.mutagen.cassandra.commandline.Main</Main-Class>
                                     </manifestEntries>
