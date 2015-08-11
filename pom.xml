@@ -1,231 +1,205 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<groupId>org.restlet</groupId>
-	<artifactId>mutagen-cassandra</artifactId>
-	<version>0.1.2-SNAPSHOT</version>
-	<packaging>jar</packaging>
+    <groupId>org.restlet</groupId>
+    <artifactId>mutagen-cassandra</artifactId>
+    <version>0.1.2-SNAPSHOT</version>
+    <packaging>jar</packaging>
 
-	<name>toddfast-mutagen-cassandra</name>
+    <name>toddfast-mutagen-cassandra</name>
 
-	<description>Mutagen Cassandra is a framework (based on Mutagen) that
-		provides CQL schema versioning and mutation for Apache Cassandra.
-	</description>
+    <description>Mutagen Cassandra is a framework (based on Mutagen) that
+        provides CQL schema versioning and mutation for Apache Cassandra.
+    </description>
 
-	<url>https://github.com/restlet/mutagen-cassandra</url>
-	<scm>
-		<url>https://github.com/restlet/mutagen-cassandra</url>
-		<connection>scm:git:git@github.com:restlet/mutagen-cassandra.git</connection>
-		<developerConnection>scm:git:git@github.com:restlet/mutagen-cassandra.git</developerConnection>
-	  <tag>HEAD</tag>
-  </scm>
+    <url>https://github.com/restlet/mutagen-cassandra</url>
+    <scm>
+        <url>https://github.com/restlet/mutagen-cassandra</url>
+        <connection>scm:git:git@github.com:restlet/mutagen-cassandra.git</connection>
+        <developerConnection>scm:git:git@github.com:restlet/mutagen-cassandra.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
 
-	<licenses>
-		<license>
-			<name>The Apache Software License, Version 2.0</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-			<distribution>repo</distribution>
-		</license>
-	</licenses>
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
-	<developers>
-		<developer>
-			<id>toddfast</id>
-			<name>Todd Fast</name>
-			<email>todd@toddfast.com</email>
-		</developer>
-	</developers>
+    <developers>
+        <developer>
+            <id>toddfast</id>
+            <name>Todd Fast</name>
+            <email>todd@toddfast.com</email>
+        </developer>
+    </developers>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	</properties>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
-	<dependencies>
-		<dependency>
-			<groupId>com.toddfast.mutagen</groupId>
-			<artifactId>mutagen</artifactId>
-			<version>0.3.0</version>
-		</dependency>
+    <dependencies>
+        <dependency>
+            <groupId>com.toddfast.mutagen</groupId>
+            <artifactId>mutagen</artifactId>
+            <version>0.3.0</version>
+        </dependency>
 
-		<!--datastax drive for cassandra -->
-		<dependency>
-			<groupId>com.datastax.cassandra</groupId>
-			<artifactId>cassandra-driver-core</artifactId>
-			<version>2.1.4</version>
-		</dependency>
+        <!--datastax drive for cassandra -->
+        <dependency>
+            <groupId>com.datastax.cassandra</groupId>
+            <artifactId>cassandra-driver-core</artifactId>
+            <version>2.1.4</version>
+        </dependency>
 
-		<dependency>
-			<groupId>org.xerial.snappy</groupId>
-			<artifactId>snappy-java</artifactId>
-			<version>1.1.1.6</version>
-			<type>jar</type>
-			<scope>compile</scope>
-		</dependency>
+        <dependency>
+            <groupId>org.xerial.snappy</groupId>
+            <artifactId>snappy-java</artifactId>
+            <version>1.1.1.6</version>
+            <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
 
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>18.0</version>
-		</dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>18.0</version>
+        </dependency>
 
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>1.7.12</version>
-		</dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.12</version>
+        </dependency>
 
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-			<version>1.1.3</version>
-			<!-- <scope>test</scope> -->
-		</dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.1.3</version>
+            <!-- <scope>test</scope> -->
+        </dependency>
 
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-core</artifactId>
-			<version>1.1.3</version>
-			<!-- <scope>test</scope> -->
-		</dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <version>1.1.3</version>
+            <!-- <scope>test</scope> -->
+        </dependency>
 
-		<dependency>
-			<groupId>info.archinnov</groupId>
-			<artifactId>achilles-junit</artifactId>
-			<version>3.1.3</version>
-			<scope>test</scope>
-		</dependency>
+        <dependency>
+            <groupId>info.archinnov</groupId>
+            <artifactId>achilles-junit</artifactId>
+            <version>3.1.3</version>
+            <scope>test</scope>
+        </dependency>
 
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.8.2</version>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
-	<!-- phase deploy -->
-	<!-- <distributionManagement>
-		<repository>
-			<id>nexus-releases</id>
-			<name>Nexus Release Repository</name>
-			<url>http://54.148.243.109:8081/nexus/content/repositories/releases/</url>
-		</repository>
-		<snapshotRepository>
-			<id>nexus-snapshots</id>
-			<name>Nexus Snapshot Repository</name>
-			<url>http://54.148.243.109:8081/nexus/content/repositories/snapshots/</url>
-		</snapshotRepository>
-	</distributionManagement>
- -->	
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.2</version>
-				<configuration>
-					<!-- or whatever version you use -->
-					<source>1.7</source>
-					<target>1.7</target>
-				</configuration>
-			</plugin>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.8.2</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    <!-- phase deploy -->
+    <!-- <distributionManagement>
+        <repository>
+            <id>nexus-releases</id>
+            <name>Nexus Release Repository</name>
+            <url>http://54.148.243.109:8081/nexus/content/repositories/releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>nexus-snapshots</id>
+            <name>Nexus Snapshot Repository</name>
+            <url>http://54.148.243.109:8081/nexus/content/repositories/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+ -->
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.2</version>
+                <configuration>
+                    <!-- or whatever version you use -->
+                    <source>1.7</source>
+                    <target>1.7</target>
+                </configuration>
+            </plugin>
 
-			<!-- include java files from src/test/resources-->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>build-helper-maven-plugin</artifactId>
-				<version>1.9.1</version>
-				<executions>
-					<execution>
-						<id>add-test-source</id>
-						<phase>generate-test-sources</phase>
-						<goals>
-							<goal>add-test-source</goal>
-						</goals>
-						<configuration>
-							<sources>
-								<source>src/test/resources</source>
-							</sources>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+            <!-- include java files from src/test/resources-->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>1.9.1</version>
+                <executions>
+                    <execution>
+                        <id>add-test-source</id>
+                        <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>add-test-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/test/resources</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<version>2.4</version>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.4</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-shade-plugin</artifactId>
-				<version>2.3</version>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>shade</goal>
-						</goals>
-						<configuration>
-							<shadedArtifactAttached>true</shadedArtifactAttached>
-							<shadedClassifierName>one-jar</shadedClassifierName>
-							<transformers>
-								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<manifestEntries>
-										<Main-Class>com.toddfast.mutagen.cassandra.commandline.Main</Main-Class>
-									</manifestEntries>
-								</transformer>
-							</transformers>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>2.3</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <shadedArtifactAttached>true</shadedArtifactAttached>
+                            <shadedClassifierName>one-jar</shadedClassifierName>
+                            <transformers>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <manifestEntries>
+                                        <Main-Class>com.toddfast.mutagen.cassandra.commandline.Main</Main-Class>
+                                    </manifestEntries>
+                                </transformer>
+                            </transformers>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-release-plugin</artifactId>
-				<version>2.5.2</version>
-				<configuration>
-					<tagNameFormat>v@{project.version}</tagNameFormat>
-					<!--<scmCommentPrefix>#42${line.separator}</scmCommentPrefix>-->
-				</configuration>
-			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.5.2</version>
+                <configuration>
+                    <tagNameFormat>v@{project.version}</tagNameFormat>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
-			<!--<plugin>-->
-				<!--<groupId>org.apache.maven.plugins</groupId>-->
-				<!--<artifactId>maven-deploy-plugin</artifactId>-->
-				<!--<configuration>-->
-					<!--<skip>true</skip>-->
-				<!--</configuration>-->
-			<!--</plugin>-->
-
-			<!--<plugin>-->
-				<!--<groupId>org.sonatype.plugins</groupId>-->
-				<!--<artifactId>nexus-staging-maven-plugin</artifactId>-->
-				<!--<executions>-->
-					<!--<execution>-->
-						<!--<id>default-deploy</id>-->
-						<!--<phase>deploy</phase>-->
-						<!--<goals>-->
-							<!--<goal>deploy</goal>-->
-						<!--</goals>-->
-					<!--</execution>-->
-				<!--</executions>-->
-				<!--&lt;!&ndash; <configuration>-->
-					<!--<serverId>nexus-snapshots</serverId>-->
-					<!--<nexusUrl>http://54.148.243.109:8081/nexus/</nexusUrl>-->
-					<!--<skipStaging>true</skipStaging>-->
-				<!--</configuration> &ndash;&gt;-->
-			<!--</plugin>-->
-		</plugins>
-	</build>
-	
 </project>
