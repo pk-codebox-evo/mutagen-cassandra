@@ -100,9 +100,7 @@ public class DBUtils {
         log.trace("Checking for empty version table");
 
         ResultSet rs = session.execute("SELECT * FROM \"Version\";");
-        if (rs.isExhausted())
-            return true;
-        return false;
+        return rs.isExhausted();
     }
 
     /**

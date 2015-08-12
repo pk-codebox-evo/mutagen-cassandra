@@ -46,5 +46,5 @@ public class MigrationInfoImpl implements MigrationInfo {
                 + " | " + getFilename()
                 + " | " + getStatus()
                 + " | \n";
-    };
+    }
 }

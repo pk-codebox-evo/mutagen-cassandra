@@ -27,7 +27,7 @@ public class CleanCommandTest extends AbstractTest {
             Assert.fail();
         } catch (InvalidQueryException e) {
             // table has been dropped
-        };
+        }
 
     }
 

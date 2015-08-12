@@ -5,6 +5,8 @@ import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
 import java.util.List;
 
+import ch.qos.logback.classic.Level;
+import com.toddfast.mutagen.cassandra.commandline.Main;
 import org.junit.Test;
 
 import com.toddfast.mutagen.Mutation;
@@ -15,9 +17,10 @@ public class MigrationOrderTest extends AbstractTest {
      */
     @Test
     public void migration_execution_order() {
-
         // Execute mutations
         mutate("mutations/tests/execution");
+
+        checkMutationSuccessful();
 
         // Get the mutations executed
         assertEquals(4, result.getCompletedMutations().size());

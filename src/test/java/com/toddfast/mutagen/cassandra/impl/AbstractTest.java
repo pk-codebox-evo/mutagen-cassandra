@@ -3,10 +3,18 @@ package com.toddfast.mutagen.cassandra.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Collections2;
+import com.toddfast.mutagen.Mutation;
+import info.archinnov.achilles.junit.AchillesResource;
 import info.archinnov.achilles.junit.AchillesResourceBuilder;
 
 import java.io.IOException;
+import java.util.List;
 
+import info.archinnov.achilles.script.ScriptExecutor;
 import org.junit.Before;
 
 import com.datastax.driver.core.BoundStatement;
@@ -17,18 +25,25 @@ import com.datastax.driver.core.Session;
 import com.toddfast.mutagen.Plan;
 import com.toddfast.mutagen.cassandra.CassandraMutagen;
 import com.toddfast.mutagen.cassandra.util.DBUtils;
+import org.junit.Rule;
+
+import javax.annotation.Nullable;
 
 /**
  * 
  * Abstract test class.
  */
 public abstract class AbstractTest {
-    /**
-     * Using the achilles to create a final global session for all tests.
-     * 
-     */
-    private static final Session session = AchillesResourceBuilder
-            .noEntityPackages().withKeyspaceName("apispark").build().getNativeSession();
+
+    @Rule
+    public AchillesResource resource = AchillesResourceBuilder
+            .noEntityPackages()
+            .withKeyspaceName("apispark")
+            .build();
+
+    private Session session = resource.getNativeSession();
+
+    private ScriptExecutor scriptExecutor = resource.getScriptExecutor();
 
     public Plan.Result<String> result;
 
@@ -70,12 +85,22 @@ public abstract class AbstractTest {
         if (result.getException() != null) {
             result.getException().printStackTrace();
         }
-        System.out.println("Completed mutations: " + result.getCompletedMutations());
-        System.out.println("Remaining mutations: " + result.getRemainingMutations());
+        printMutations("Completed mutations:", result.getCompletedMutations());
+        printMutations("Remaining mutations:", result.getRemainingMutations());
 
         // Check for completion and errors
         assertTrue(result.isMutationComplete());
         assertNull(result.getException());
+    }
+
+    protected void printMutations(String title, List<Mutation<String>> mutations) {
+        System.out.println(title + Collections2.transform(mutations, new Function<Mutation<?>, String>() {
+            @Nullable
+            @Override
+            public String apply(Mutation<?> mutation) {
+                return "\n\t- " + mutation;
+            }
+        }));
     }
 
     /**
@@ -138,10 +163,11 @@ public abstract class AbstractTest {
         return result;
     }
 
-    /**
-     * @return the session
-     */
-    public static Session getSession() {
+    public ScriptExecutor getScriptExecutor() {
+        return scriptExecutor;
+    }
+
+    public Session getSession() {
         return session;
     }
 

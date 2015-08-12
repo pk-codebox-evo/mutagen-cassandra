@@ -66,8 +66,9 @@ public class Main {
             Result<String> mutationResult = mutagen.migrate(location);
 
             showMigrationResults(mutationResult);
-            if (mutationResult.getException() != null) {
-                throw mutationResult.getException();
+            MutagenException mutationResultException = mutationResult.getException();
+            if (mutationResultException != null) {
+                throw mutationResultException;
             }
         } else if ("info".equals(operation)) {
             mutagen.info().refresh();
@@ -84,12 +85,10 @@ public class Main {
 
     /**
      * Add the location in the classpath.
-     * 
-     * @param properties
      */
     public static void loadLocationToClasspath(Properties properties) {
         String location = properties.getProperty("location");
-        if (location == null || location.indexOf("/") < 0) {
+        if (location == null || !location.contains("/")) {
             addToClassPath(".");
             return;
         }
@@ -135,9 +134,9 @@ public class Main {
             URL url = new File(path).toURI().toURL();
             URLClassLoader urlClassLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
             Class<URLClassLoader> urlClass = URLClassLoader.class;
-            Method method = urlClass.getDeclaredMethod("addURL", new Class[] { URL.class });
+            Method method = urlClass.getDeclaredMethod("addURL", URL.class);
             method.setAccessible(true);
-            method.invoke(urlClassLoader, new Object[] { url });
+            method.invoke(urlClassLoader, url);
         } catch (Exception e) {
             throw new RuntimeException("Can not load " + path, e);
         }
@@ -145,9 +144,6 @@ public class Main {
 
     /**
      * Load resources.
-     * 
-     * @param mutagen
-     * @throws IOException
      */
     private static void loadResources(CassandraMutagen mutagen) {
         try {
@@ -160,7 +156,6 @@ public class Main {
     }
 
     /**
-     * @param mutagen
      */
     private static String setLocation(CassandraMutagen mutagen) {
         String location = mutagen.getLocation();
@@ -185,73 +180,62 @@ public class Main {
      *            - the result of migration.
      */
     private static void showMigrationResults(Plan.Result<String> result) {
+        printMutations("Completed mutations:", result.getCompletedMutations());
+        printMutations("Remaining mutations:", result.getRemainingMutations());
         if (result.isMutationComplete()) {
             LOGGER.info("Migration is finished.");
         } else {
-            LOGGER.error("Migration is not finished!");
-            LOGGER.error(result.getCompletedMutations().size() + " migrations are finished");
-            LOGGER.error(result.getRemainingMutations().size() + " migration are not finished");
+            LOGGER.error("Migration aborted!");
         }
+    }
+
+    protected static void printMutations(String title, List<Mutation<String>> mutations) {
+        LOGGER.info(title + Collections2.transform(mutations, new Function<Mutation<?>, String>() {
+            @Nullable
+            @Override
+            public String apply(Mutation<?> mutation) {
+                return "\n\t- " + mutation;
+            }
+        }));
     }
 
     /**
      * Create session.
-     * 
+     *
      * @param properties
      *            - properties
-     * @return
      */
     private static Session createSession(Cluster cluster, Properties properties) {
 
         String keyspace = getProperty(properties, "keyspace");
-        return (keyspace != null ?
-                cluster.connect(keyspace) :
-                cluster.connect());
+        return CassandraUtils.getSession(cluster, keyspace);
 
     }
 
     /**
      * Create cluster.
-     * 
+     *
      * @param properties
      *            - properties.
-     * @return
      */
     private static Cluster createCluster(Properties properties) {
-        String clusterContactPoint, clusterPort, useCredentials, dbuser, dbpassword;
-
-        // get cluster builder
-        Cluster.Builder clusterBuilder = Cluster.builder().withProtocolVersion(ProtocolVersion.V2);
-
-        // set contact point
-        if ((clusterContactPoint = getProperty(properties, "clusterContactPoint")) != null)
-            clusterBuilder = clusterBuilder.addContactPoint(clusterContactPoint);
-
-        // set cluster port if given
-        if ((clusterPort = getProperty(properties, "clusterPort")) != null)
-            try {
-                clusterBuilder = clusterBuilder.withPort(Integer.parseInt(clusterPort));
-            } catch (NumberFormatException e) {
-                System.err.println("Port parameter must be an integer");
-                System.exit(1);
-            }
-
-        // set credentials if given
-        if ((useCredentials = getProperty(properties, "useCredentials")) != null && useCredentials.matches("true")) {
-
-            if ((dbuser = getProperty(properties, "dbuser")) != null
-                    && (dbpassword = getProperty(properties, "dbpassword")) != null)
-                clusterBuilder = clusterBuilder.withCredentials(dbuser, dbpassword);
-            else {
-                System.err.println("missing dbuser or dbpassword properties");
-                System.exit(0);
-            }
-
+        String clusterContactPointsValue = getProperty(properties, "clusterContactPoints");
+        List<String> clusterContactPoints = null;
+        if (clusterContactPointsValue != null) {
+            clusterContactPoints = Arrays.asList(clusterContactPointsValue.split(","));
         }
 
-        // build cluster
-        Cluster cluster = clusterBuilder.build();
-        return cluster;
+        String clusterPort = getProperty(properties, "clusterPort");
+
+        String useCredentialsValue = getProperty(properties, "useCredentials");
+        boolean useCredentials = useCredentialsValue != null &&
+                useCredentialsValue.equals("true");
+
+        String dbuser = getProperty(properties, "dbuser");
+
+        String dbpassword = getProperty(properties, "dbpassword");
+
+        return CassandraUtils.createCluster(clusterContactPoints, clusterPort, useCredentials, dbuser, dbpassword);
     }
 
     /**
@@ -261,7 +245,6 @@ public class Main {
      *            - properties
      * @param name
      *            - name
-     * @return
      */
     private static String getProperty(Properties properties, String name) {
         String s = properties.getProperty(name);
@@ -321,7 +304,7 @@ public class Main {
      * @return The operations. An empty list if none.
      */
     private static List<String> determineOperations(String[] args) {
-        List<String> operations = new ArrayList<String>();
+        List<String> operations = new ArrayList<>();
 
         for (String arg : args) {
             if (!arg.startsWith("-")) {

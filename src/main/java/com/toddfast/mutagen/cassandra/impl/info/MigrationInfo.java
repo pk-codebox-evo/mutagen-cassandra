@@ -7,29 +7,29 @@ public interface MigrationInfo {
      * @return the timestamp of migration.
      * 
      */
-    public String getVersion();
+    String getVersion();
 
     /**
      * @return the date when the migration was executed.
      * 
      */
-    public Date getDate();
+    Date getDate();
 
     /**
      * @return the filename of the script migration.
      * 
      */
-    public String getFilename();
+    String getFilename();
 
     /**
      * @return if the migration success or not.
      * 
      */
-    public String getStatus();
+    String getStatus();
 
     /**
      * @return the string representation of migration.
      * 
      */
-    public String toString();
+    String toString();
 }

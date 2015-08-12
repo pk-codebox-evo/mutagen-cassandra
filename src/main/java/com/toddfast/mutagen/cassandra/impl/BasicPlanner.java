@@ -60,8 +60,7 @@ public class BasicPlanner<I extends Comparable<I>> implements Planner<I> {
     @Override
     public Plan<I> getPlan(Subject<I> subject, Coordinator<I> coordinator) {
 
-        List<Mutation<I>> subjectMutations =
-                new ArrayList<Mutation<I>>(mutations);
+        List<Mutation<I>> subjectMutations = new ArrayList<>(mutations);
 
         // Filter out the mutations that are unacceptable to the subject
         for (Iterator<Mutation<I>> i = subjectMutations.iterator(); i.hasNext();) {
@@ -83,9 +82,8 @@ public class BasicPlanner<I extends Comparable<I>> implements Planner<I> {
      * @return mutations result.
      */
     private BasicResult executePlan(BasicPlan plan) {
-        List<Mutation<I>> completedMutations = new ArrayList<Mutation<I>>();
-        List<Mutation<I>> remainingMutations =
-                new ArrayList<Mutation<I>>(plan.getMutations());
+        List<Mutation<I>> completedMutations = new ArrayList<>();
+        List<Mutation<I>> remainingMutations = new ArrayList<>(plan.getMutations());
         MutagenException exception = null;
 
         Context context = createContext(

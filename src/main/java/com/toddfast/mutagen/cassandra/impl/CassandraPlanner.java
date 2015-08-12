@@ -129,8 +129,8 @@ public class CassandraPlanner extends BasicPlanner<String> {
         }
 
         // create set to get duplicate state.
-        Set<String> set = new HashSet<String>();
-        ArrayList<String> duplicateResourceState = new ArrayList<String>();
+        Set<String> set = new HashSet<>();
+        ArrayList<String> duplicateResourceState = new ArrayList<>();
         for (String state : states) {
             if (!set.add(state)) {
                 duplicateResourceState.add(state);
@@ -147,8 +147,6 @@ public class CassandraPlanner extends BasicPlanner<String> {
      * validate if the script file is well named(
      * M<DATETIME>_<Camel case title>_<ISSUE>.cqlsh.txt or
      * M<DATETIME>_<Camel case title>_<ISSUE>.java)
-     * 
-     * @return
      */
     private static boolean validate(String resource) {
         String filename = Paths.get(resource).getFileName().toString();
@@ -239,8 +237,7 @@ public class CassandraPlanner extends BasicPlanner<String> {
 
         LOGGER.trace("Entering getPlan(subject={}, coordinator={})", subject, coordinator);
 
-        List<Mutation<String>> subjectMutations =
-                new ArrayList<Mutation<String>>(getMutations());
+        List<Mutation<String>> subjectMutations = new ArrayList<>(getMutations());
 
         // Filter out the mutations that are unacceptable to the subject
         for (Iterator<Mutation<String>> i = subjectMutations.iterator(); i.hasNext();) {

@@ -28,7 +28,7 @@ public abstract class AbstractCassandraMutation implements Mutation<String> {
     // //////////////////////////////////////////////////////////////////////////
     // Fields
     // //////////////////////////////////////////////////////////////////////////
-    private final static String VERSION_PATTERN = "M(\\d{12})_.*";;
+    private final static String VERSION_PATTERN = "M(\\d{12})_.*";
 
     private static Logger LOGGER = LoggerFactory.getLogger(AbstractCassandraMutation.class);
 
