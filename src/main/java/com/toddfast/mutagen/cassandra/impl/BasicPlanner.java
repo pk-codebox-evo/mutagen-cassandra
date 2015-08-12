@@ -96,8 +96,8 @@ public class BasicPlanner<I extends Comparable<I>> implements Planner<I> {
             mutation = i.next();
 
             try {
-                if (mutation instanceof AbstractCassandraMutation) {
-                    ((AbstractCassandraMutation) mutation).setIgnoreDB(isIgnoreDB());
+                if ((Mutation<String>)mutation instanceof AbstractCassandraMutation) {
+                    ((AbstractCassandraMutation) (Mutation<String>)mutation).setIgnoreDB(isIgnoreDB());
                 }
                 mutation.mutate(context);
                 lastState = mutation.getResultingState();

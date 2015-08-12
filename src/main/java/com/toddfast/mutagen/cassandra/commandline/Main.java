@@ -13,9 +13,7 @@ import java.util.List;
 import java.util.Properties;
 
 import com.google.common.base.Function;
-import com.google.common.base.Joiner;
 import com.google.common.collect.Collections2;
-import com.sun.istack.internal.Nullable;
 import com.toddfast.mutagen.MutagenException;
 import com.toddfast.mutagen.Mutation;
 import com.toddfast.mutagen.cassandra.util.CassandraUtils;
@@ -198,7 +196,6 @@ public class Main {
 
     protected static void printMutations(String title, List<Mutation<String>> mutations) {
         LOGGER.info(title + Collections2.transform(mutations, new Function<Mutation<?>, String>() {
-            @Nullable
             @Override
             public String apply(Mutation<?> mutation) {
                 return "\n\t- " + mutation;

@@ -2,7 +2,7 @@ package com.toddfast.mutagen.cassandra.impl;
 
 import java.io.IOException;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.Test;
 

@@ -1,33 +1,28 @@
 package com.toddfast.mutagen.cassandra.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.collect.Collections2;
-import com.toddfast.mutagen.Mutation;
-import info.archinnov.achilles.junit.AchillesResource;
-import info.archinnov.achilles.junit.AchillesResourceBuilder;
-
-import java.io.IOException;
-import java.util.List;
-
-import info.archinnov.achilles.script.ScriptExecutor;
-import org.junit.Before;
-
 import com.datastax.driver.core.BoundStatement;
 import com.datastax.driver.core.PreparedStatement;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
+import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
+import com.toddfast.mutagen.Mutation;
 import com.toddfast.mutagen.Plan;
 import com.toddfast.mutagen.cassandra.CassandraMutagen;
 import com.toddfast.mutagen.cassandra.util.DBUtils;
+import info.archinnov.achilles.junit.AchillesResource;
+import info.archinnov.achilles.junit.AchillesResourceBuilder;
+import info.archinnov.achilles.script.ScriptExecutor;
+import org.junit.Before;
 import org.junit.Rule;
 
-import javax.annotation.Nullable;
+import java.io.IOException;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * 
@@ -95,7 +90,6 @@ public abstract class AbstractTest {
 
     protected void printMutations(String title, List<Mutation<String>> mutations) {
         System.out.println(title + Collections2.transform(mutations, new Function<Mutation<?>, String>() {
-            @Nullable
             @Override
             public String apply(Mutation<?> mutation) {
                 return "\n\t- " + mutation;
