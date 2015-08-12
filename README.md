@@ -141,7 +141,22 @@ The proper thing is for Mutagen Cassandra to handle this coordination via a clus
 Release
 -------
 
-Do a dry run
+To tag repo and bump version, do:
 ```
-mvn release:prepare -DdryRun=true
+mvn release:clean release:prepare
+```
+
+Alternative to use default settings and execute script in a non-interactive mode
+```
+mvn --batch-mode release:clean release:prepare
+```
+
+To deploy tag artefacts, do:
+```
+mvn release:perform
+```
+
+Then, clean with:
+```
+mvn release:clean
 ```
