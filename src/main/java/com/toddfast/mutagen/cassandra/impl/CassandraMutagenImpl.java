@@ -41,7 +41,7 @@ public class CassandraMutagenImpl extends CassandraMutagen {
     public void initialize()
             throws IOException {
         LOGGER.debug("Initialising with resourcePath {}", getLocation());
-        setResources(LoadResources.loadResources(this, getLocation()));
+        setResources(LoadResources.loadResources(this, getLocation(), getResourceScannerPatternFilter()));
 
     }
 
@@ -60,7 +60,6 @@ public class CassandraMutagenImpl extends CassandraMutagen {
         if (location != null) {
             setLocation(location);
         }
-
     }
 
     /**

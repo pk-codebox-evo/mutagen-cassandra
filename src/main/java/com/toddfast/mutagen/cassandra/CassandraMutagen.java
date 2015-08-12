@@ -22,6 +22,8 @@ public abstract class CassandraMutagen {
 
     private String location;
 
+    private String resourceScannerPatternFilter = ".*";
+
     public CassandraMutagen(Session session) {
         this.setSession(session);
         this.setLocation("mutations");
@@ -115,6 +117,14 @@ public abstract class CassandraMutagen {
      */
     public void setSession(Session session) {
         this.session = session;
+    }
+
+    public String getResourceScannerPatternFilter() {
+        return resourceScannerPatternFilter;
+    }
+
+    public void setResourceScannerPatternFilter(String resourceScannerPatternFilter) {
+        this.resourceScannerPatternFilter = resourceScannerPatternFilter;
     }
 
     /**

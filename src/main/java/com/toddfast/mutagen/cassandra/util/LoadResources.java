@@ -82,19 +82,22 @@ public class LoadResources {
      * Retrives all the scripts under the indicated resource path.
      * Sort them according their datetime, save them.
      * 
-     * @param rootResourcePath
-     *            - resource path.
      * @param mutagen
      *            - The cassandraMutagen instance that executes mutations.
+     * @param rootResourcePath
+     *            - resource path.
+     * @param resourceScannerPatternFilter
+     *            - Pattern filter.
      * @return List of resources founded.
      * @throws IOException
      */
-    public static List<String> loadResources(CassandraMutagen mutagen, String rootResourcePath) throws IOException {
+    public static List<String> loadResources(CassandraMutagen mutagen, String rootResourcePath, String resourceScannerPatternFilter) throws IOException {
         List<String> resources = new ArrayList<>();
+
         try {
             List<String> discoveredResources =
                     ResourceScanner.getInstance().getResources(
-                            rootResourcePath, Pattern.compile(".*"),
+                            rootResourcePath, Pattern.compile(resourceScannerPatternFilter),
                             mutagen.getClass().getClassLoader());
             // Make sure we found some resources
             if (discoveredResources.isEmpty()) {
