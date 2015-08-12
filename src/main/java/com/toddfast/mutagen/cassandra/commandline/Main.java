@@ -8,16 +8,23 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Collections2;
+import com.sun.istack.internal.Nullable;
+import com.toddfast.mutagen.MutagenException;
+import com.toddfast.mutagen.Mutation;
+import com.toddfast.mutagen.cassandra.util.CassandraUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.Level;
 
 import com.datastax.driver.core.Cluster;
-import com.datastax.driver.core.ProtocolVersion;
 import com.datastax.driver.core.Session;
 import com.toddfast.mutagen.Plan;
 import com.toddfast.mutagen.Plan.Result;
@@ -275,25 +282,26 @@ public class Main {
 
     /**
      * Initializes the logging.
-     *
-     * @param level
-     *            The minimum level to log at.
      */
-    static void initLogging(String[] args) {
+    public static void initLogging(String[] args) {
+        for (String arg : args) {
+            if ("-I".equals(arg)) {
+                initLogging(Level.INFO);
+            }
+            if ("-X".equals(arg)) {
+                initLogging(Level.DEBUG);
+            }
+            if ("-q".equals(arg)) {
+                initLogging(Level.WARN);
+            }
+        }
+    }
+
+    public static void initLogging(Level level) {
         ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) LoggerFactory
                 .getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
 
-        for (String arg : args) {
-            if ("-I".equals(arg)) {
-                root.setLevel(Level.INFO);
-            }
-            if ("-X".equals(arg)) {
-                root.setLevel(Level.DEBUG);
-            }
-            if ("-q".equals(arg)) {
-                root.setLevel(Level.WARN);
-            }
-        }
+        root.setLevel(level);
     }
 
     /**
