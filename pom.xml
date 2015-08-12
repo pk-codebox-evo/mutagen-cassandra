@@ -6,7 +6,7 @@
     <version>0.1.3-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>toddfast-mutagen-cassandra</name>
+    <name>restlet-mutagen-cassandra</name>
 
     <description>Mutagen Cassandra is a framework (based on Mutagen) that
         provides CQL schema versioning and mutation for Apache Cassandra.
@@ -27,14 +27,6 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-
-    <developers>
-        <developer>
-            <id>toddfast</id>
-            <name>Todd Fast</name>
-            <email>todd@toddfast.com</email>
-        </developer>
-    </developers>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
