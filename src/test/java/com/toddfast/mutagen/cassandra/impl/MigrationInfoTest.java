@@ -4,7 +4,6 @@ import com.toddfast.mutagen.cassandra.MutationStatus;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.toddfast.mutagen.cassandra.CassandraMutagen;
 import com.toddfast.mutagen.cassandra.impl.info.MigrationInfoService;
 
 public class MigrationInfoTest extends AbstractTest {

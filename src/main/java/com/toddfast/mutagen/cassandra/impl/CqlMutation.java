@@ -37,8 +37,6 @@ public class CqlMutation extends AbstractCassandraMutation {
 
     /**
      * Get the source of the CQL script.
-     * 
-     * @return
      */
     protected String getSource() {
         return source;
@@ -46,8 +44,6 @@ public class CqlMutation extends AbstractCassandraMutation {
 
     /**
      * Return md5 hash of source
-     * 
-     * @return
      */
     @Override
     public String getChecksum() {
@@ -56,8 +52,6 @@ public class CqlMutation extends AbstractCassandraMutation {
 
     /**
      * Get the ressource name.
-     * 
-     * @return
      */
     @Override
     public String getResourceName() {
@@ -227,7 +221,7 @@ public class CqlMutation extends AbstractCassandraMutation {
 
     private String ressource;
 
-    private List<String> statements = new ArrayList<String>();
+    private List<String> statements = new ArrayList<>();
 
 
 }

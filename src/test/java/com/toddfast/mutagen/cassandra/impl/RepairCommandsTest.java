@@ -8,7 +8,6 @@ import org.junit.Assert;
 
 import org.junit.Test;
 
-import com.datastax.driver.core.ResultSet;
 import com.toddfast.mutagen.cassandra.CassandraMutagen;
 
 public class RepairCommandsTest extends AbstractTest {

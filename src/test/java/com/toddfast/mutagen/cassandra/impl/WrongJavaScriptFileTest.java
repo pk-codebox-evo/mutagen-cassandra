@@ -1,6 +1,7 @@
 package com.toddfast.mutagen.cassandra.impl;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
 
@@ -14,7 +15,7 @@ public class WrongJavaScriptFileTest extends AbstractTest {
         mutate("mutations/tests/wrongJavaScript");
 
         // wrong java script file throws mutagen exception
-        assertEquals(true, result.getException() instanceof MutagenException);
+        assertNotNull(result.getException());
 
     }
 }

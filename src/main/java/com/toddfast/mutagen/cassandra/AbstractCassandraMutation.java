@@ -11,11 +11,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.datastax.driver.core.Session;
-import com.toddfast.mutagen.MutagenException;
 import com.toddfast.mutagen.Mutation;
 import com.toddfast.mutagen.State;
 import com.toddfast.mutagen.basic.SimpleState;
-import com.toddfast.mutagen.cassandra.util.DBUtils;
+import com.toddfast.mutagen.cassandra.utils.DBUtils;
 
 /**
  * Base class for cassandra mutation.

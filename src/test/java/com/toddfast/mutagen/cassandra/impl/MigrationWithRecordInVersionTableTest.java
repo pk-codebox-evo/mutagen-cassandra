@@ -1,6 +1,5 @@
 package com.toddfast.mutagen.cassandra.impl;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -11,7 +10,7 @@ import com.toddfast.mutagen.cassandra.MutationStatus;
 import org.junit.Test;
 
 import com.toddfast.mutagen.Mutation;
-import com.toddfast.mutagen.cassandra.util.DBUtils;
+import com.toddfast.mutagen.cassandra.utils.DBUtils;
 
 
 public class MigrationWithRecordInVersionTableTest extends AbstractTest {
@@ -37,7 +36,7 @@ public class MigrationWithRecordInVersionTableTest extends AbstractTest {
         mutate("mutations/tests/execution");
 
         // Get the mutations executed
-        List<String> mutations = new ArrayList<String>();
+        List<String> mutations = new ArrayList<>();
         for (Mutation<String> mutation : result.getCompletedMutations())
             mutations.add(mutation.getResultingState().getID());
 

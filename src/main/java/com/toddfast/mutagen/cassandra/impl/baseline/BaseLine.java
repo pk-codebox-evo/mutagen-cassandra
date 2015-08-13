@@ -6,7 +6,7 @@ import com.toddfast.mutagen.Mutation;
 import com.toddfast.mutagen.cassandra.AbstractCassandraMutation;
 import com.toddfast.mutagen.cassandra.CassandraMutagen;
 import com.toddfast.mutagen.cassandra.MutationStatus;
-import com.toddfast.mutagen.cassandra.util.DBUtils;
+import com.toddfast.mutagen.cassandra.utils.DBUtils;
 
 public class BaseLine {
     // Fields

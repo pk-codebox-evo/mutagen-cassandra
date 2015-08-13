@@ -64,12 +64,12 @@ public abstract class JavaMutation extends AbstractCassandraMutation {
 
     }
 
-    public static final byte[] getClassContents(Class<?> myClass) throws IOException {
+    public static byte[] getClassContents(Class<?> myClass) throws IOException {
 
         LOGGER.trace("Entering getClassContents(class={})", myClass);
 
         String path = myClass.getName().replace('.', '/');
-        String fileName = new StringBuffer(path).append(".class").toString();
+        String fileName = path + ".class";
         InputStream is = myClass.getClassLoader().getResourceAsStream(fileName);
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         int datum = is.read();

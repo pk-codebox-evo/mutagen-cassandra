@@ -6,7 +6,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.toddfast.mutagen.cassandra.CassandraMutagen;
-import com.toddfast.mutagen.cassandra.util.DBUtils;
+import com.toddfast.mutagen.cassandra.utils.DBUtils;
 
 public class BaselineCommandTest extends AbstractTest {
 

@@ -1,4 +1,4 @@
-package com.toddfast.mutagen.cassandra.util;
+package com.toddfast.mutagen.cassandra.utils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -25,12 +25,8 @@ public class LoadResources {
     private static final Comparator<String> COMPARATOR =
             new Comparator<String>() {
                 @Override
-                public int compare(String path1, String path2) {
-                    final String origPath1 = path1;
-                    final String origPath2 = path2;
-
+                public int compare(final String path1, final String path2) {
                     try {
-
                         int index1 = path1.lastIndexOf("/");
                         int index2 = path2.lastIndexOf("/");
 
@@ -65,8 +61,8 @@ public class LoadResources {
                     }
                     catch (StringIndexOutOfBoundsException e) {
                         throw new StringIndexOutOfBoundsException(e.getMessage() +
-                                " (path1: \"" + origPath1 +
-                                "\", path2: \"" + origPath2 + "\")");
+                                " (path1: \"" + path1 +
+                                "\", path2: \"" + path2 + "\")");
                     }
                 }
             };

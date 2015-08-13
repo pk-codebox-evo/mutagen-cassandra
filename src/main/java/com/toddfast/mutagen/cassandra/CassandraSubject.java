@@ -4,7 +4,7 @@ import com.datastax.driver.core.Session;
 import com.toddfast.mutagen.State;
 import com.toddfast.mutagen.Subject;
 import com.toddfast.mutagen.basic.SimpleState;
-import com.toddfast.mutagen.cassandra.util.DBUtils;
+import com.toddfast.mutagen.cassandra.utils.DBUtils;
 
 /**
  * Cassandra subject represents the table Version.
@@ -33,7 +33,6 @@ public class CassandraSubject implements Subject<String> {
     @Override
     public State<String> getCurrentState() {
         String current = DBUtils.getCurrentState(session);
-        SimpleState<String> currentState = new SimpleState<String>(current);
-        return currentState;
+        return new SimpleState<>(current);
     }
 }

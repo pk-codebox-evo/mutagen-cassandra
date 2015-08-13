@@ -1,4 +1,4 @@
-package com.toddfast.mutagen.cassandra.util;
+package com.toddfast.mutagen.cassandra.utils;
 
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ProtocolVersion;

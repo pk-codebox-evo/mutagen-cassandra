@@ -16,8 +16,8 @@ import com.toddfast.mutagen.cassandra.CassandraSubject;
 import com.toddfast.mutagen.cassandra.impl.baseline.BaseLine;
 import com.toddfast.mutagen.cassandra.impl.info.MigrationInfoService;
 import com.toddfast.mutagen.cassandra.impl.info.MigrationInfoServiceImpl;
-import com.toddfast.mutagen.cassandra.util.DBUtils;
-import com.toddfast.mutagen.cassandra.util.LoadResources;
+import com.toddfast.mutagen.cassandra.utils.DBUtils;
+import com.toddfast.mutagen.cassandra.utils.LoadResources;
 
 /**
  * An implementation for cassandraMutagen.
@@ -59,6 +59,11 @@ public class CassandraMutagenImpl extends CassandraMutagen {
         String location = properties.getProperty("location");
         if (location != null) {
             setLocation(location);
+        }
+        // get resourceScannerPatternFilter
+        String resourceScannerPatternFilter = properties.getProperty("resourceScannerPatternFilter");
+        if (resourceScannerPatternFilter != null) {
+            setResourceScannerPatternFilter(resourceScannerPatternFilter);
         }
     }
 
@@ -105,9 +110,7 @@ public class CassandraMutagenImpl extends CassandraMutagen {
 
     @Override
     public Plan.Result<String> migrate(String path) {
-        Plan.Result<String> result = this.migrate(path, false);
-
-        return result;
+        return this.migrate(path, false);
     }
 
     @Override
@@ -132,9 +135,7 @@ public class CassandraMutagenImpl extends CassandraMutagen {
 
     @Override
     public Plan.Result<String> withInitScript(String path) {
-        Plan.Result<String> result = this.migrate(path, true);
-
-        return result;
+        return this.migrate(path, true);
     }
 
     /**

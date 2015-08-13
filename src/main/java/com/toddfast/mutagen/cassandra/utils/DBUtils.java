@@ -1,4 +1,4 @@
-package com.toddfast.mutagen.cassandra.util;
+package com.toddfast.mutagen.cassandra.utils;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -148,7 +148,6 @@ public class DBUtils {
     /**
      * Retrive record for a given versionId
      * 
-     * @param versionId
      * @return Result set with one row if versionId present, empty otherwise
      */
     public static ResultSet getVersionRecordByVersionId(Session session, String versionId) {
@@ -184,7 +183,7 @@ public class DBUtils {
         log.trace("Entering deleteFailedVersionRecord(session={})", session);
 
         ResultSet rs = getVersionRecords(session);
-        List<Row> selectedRows = new ArrayList<Row>();
+        List<Row> selectedRows = new ArrayList<>();
 
         while (!rs.isExhausted()) {
             Row r = rs.one();
@@ -264,7 +263,7 @@ public class DBUtils {
         log.trace("Entering getCurrentState(session={})", session);
 
         String version = "000000000000";
-        ResultSet results = null;
+        ResultSet results;
         try {
             results = getVersionRecords(session);
         } catch (Exception e) {

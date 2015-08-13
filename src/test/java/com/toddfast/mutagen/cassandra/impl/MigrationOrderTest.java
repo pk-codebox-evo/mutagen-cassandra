@@ -5,8 +5,6 @@ import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
 import java.util.List;
 
-import ch.qos.logback.classic.Level;
-import com.toddfast.mutagen.cassandra.commandline.Main;
 import org.junit.Test;
 
 import com.toddfast.mutagen.Mutation;

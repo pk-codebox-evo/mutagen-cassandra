@@ -33,7 +33,7 @@ public class MigrationInfoCommand {
         int stateWidth = STATUS_TITLE.length();
 
         for (MigrationInfo migrationInfo : migrationInfos) {
-            versionWidth = Math.max(versionWidth, migrationInfo.getVersion().toString().length());
+            versionWidth = Math.max(versionWidth, migrationInfo.getVersion().length());
             dateWidth = Math.max(dateWidth, migrationInfo.getDate().toString().length());
             filenameWidth = Math.max(filenameWidth, migrationInfo.getFilename().length());
             stateWidth = Math.max(stateWidth, migrationInfo.getStatus().length());

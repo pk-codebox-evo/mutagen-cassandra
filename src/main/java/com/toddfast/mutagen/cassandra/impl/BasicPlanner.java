@@ -48,7 +48,7 @@ public class BasicPlanner<I extends Comparable<I>> implements Planner<I> {
     public BasicPlanner(Collection<Mutation<I>> allMutations,
             Comparator<Mutation<I>> comparator) {
         super();
-        this.mutations = new ArrayList<Mutation<I>>(allMutations);
+        this.mutations = new ArrayList<>(allMutations);
         if (comparator != null) {
             Collections.sort(this.mutations, comparator);
         }
@@ -124,7 +124,6 @@ public class BasicPlanner<I extends Comparable<I>> implements Planner<I> {
      *            - mutation suject.
      * @param coordinator
      *            - mutation coordinator.
-     * @return
      */
     protected Context createContext(Subject<I> subject,
             Coordinator<I> coordinator) {

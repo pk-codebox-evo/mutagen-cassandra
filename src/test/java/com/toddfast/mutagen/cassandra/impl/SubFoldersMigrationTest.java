@@ -1,14 +1,10 @@
 package com.toddfast.mutagen.cassandra.impl;
 
-import com.datastax.driver.core.Row;
 import com.toddfast.mutagen.MutagenException;
 import com.toddfast.mutagen.cassandra.MutationStatus;
 import com.toddfast.mutagen.cassandra.impl.info.MigrationInfo;
 import org.junit.Assert;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 public class SubFoldersMigrationTest extends AbstractTest {
 
