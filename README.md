@@ -161,6 +161,12 @@ Then, clean with:
 mvn release:clean
 ```
 
+And push to remote repository
+```
+git push
+```
+
+
 Industrialization on jenkins for example:
 ```
 mvn release:clean release:prepare release:perform -DreleaseVersion=${releaseVersion} -DdevelopmentVersion=${developmentVersion}
