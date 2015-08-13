@@ -5,6 +5,7 @@ import com.toddfast.mutagen.MutagenException;
 import com.toddfast.mutagen.Mutation;
 import com.toddfast.mutagen.cassandra.AbstractCassandraMutation;
 import com.toddfast.mutagen.cassandra.CassandraMutagen;
+import com.toddfast.mutagen.cassandra.MutationStatus;
 import com.toddfast.mutagen.cassandra.util.DBUtils;
 
 public class BaseLine {
@@ -44,7 +45,7 @@ public class BaseLine {
             }
         }
         if (!DBUtils.isVersionIdPresent(getSession(), getBaselineVersion())) {
-            DBUtils.appendVersionRecord(getSession(), getBaselineVersion(), "", "", 0, "Baseline");
+            DBUtils.appendVersionRecord(getSession(), getBaselineVersion(), "", "", 0, MutationStatus.BASELINE.getValue());
         }
     }
 
@@ -59,9 +60,9 @@ public class BaseLine {
 
         // append version record
         if (version.compareTo(getBaselineVersion()) < 0) {
-            DBUtils.appendVersionRecord(getSession(), version, mutation.getResourceName(), checksum, 0, "<Baseline");
+            DBUtils.appendVersionRecord(getSession(), version, mutation.getResourceName(), checksum, 0, MutationStatus.BEFORE_BASELINE.getValue());
         } else if (version.compareTo(getBaselineVersion()) == 0) {
-            DBUtils.appendVersionRecord(getSession(), version, mutation.getResourceName(), checksum, 0, "Baseline");
+            DBUtils.appendVersionRecord(getSession(), version, mutation.getResourceName(), checksum, 0, MutationStatus.BASELINE.getValue());
         }
     }
 

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.toddfast.mutagen.cassandra.MutationStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -187,7 +188,7 @@ public class DBUtils {
 
         while (!rs.isExhausted()) {
             Row r = rs.one();
-            if (r.getString("status").equals("Failed")) {
+            if (r.getString("status").equals(MutationStatus.FAILED.getValue())) {
                 log.info("The following record has been selected for deletion : {}", r);
                 selectedRows.add(r);
             }
@@ -204,7 +205,6 @@ public class DBUtils {
     /**
      * Check if the versionId exists in the database.
      * 
-     * @param versionId
      * @return true if versionId is in the database
      */
     public static boolean isVersionIdPresent(Session session, String versionId) {
@@ -215,7 +215,6 @@ public class DBUtils {
     /**
      * Check if the mutation fails.
      * 
-     * @param versionId
      * @return true if versionId is in the database
      */
     public static boolean isMutationFailed(Session session, String versionId) {
@@ -225,7 +224,7 @@ public class DBUtils {
         boolean hasFailed = false;
 
         // if there's one and only one row, and the mutation has failed
-        if (rows.size() == 1 && rows.get(0).getString("status").equals("Failed"))
+        if (rows.size() == 1 && rows.get(0).getString("status").equals(MutationStatus.FAILED.getValue()))
             hasFailed = true;
 
         log.trace("Executed isVersionIdPresent(session={}, versionId={}) : {}", session, versionId, hasFailed);
@@ -291,7 +290,7 @@ public class DBUtils {
             log.trace("Parsing row {}", r);
 
             String versionid = r.getString("versionid");
-            if ((!r.getString("status").equals("Failed")) && version.compareTo(versionid) < 0)
+            if ((!r.getString("status").equals(MutationStatus.FAILED.getValue())) && version.compareTo(versionid) < 0)
                 version = versionid;
         }
 

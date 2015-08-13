@@ -198,7 +198,7 @@ public class CqlMutation extends AbstractCassandraMutation {
      */
     @Override
     protected void performMutation(Context context) {
-        context.debug("Executing mutation {}", getResultingState().getID());
+        context.info("Executing mutation {}", getResultingState().getID());
         for (String statement : statements) {
             context.debug("Executing CQL statement \"{}\"", statement);
             try {

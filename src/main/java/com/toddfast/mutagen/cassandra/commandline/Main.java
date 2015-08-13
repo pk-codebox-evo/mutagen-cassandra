@@ -52,6 +52,7 @@ public class Main {
             CassandraMutagen mutagen = new CassandraMutagenImpl(session);
             mutagen.configure(properties);
             for (String operation : operations) {
+                LOGGER.info("execute operation '" + operation+"'");
                 executeOperation(mutagen, operation);
             }
         } catch (Exception e) {

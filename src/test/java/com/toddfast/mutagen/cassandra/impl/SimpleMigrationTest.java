@@ -3,11 +3,14 @@ package com.toddfast.mutagen.cassandra.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import com.toddfast.mutagen.cassandra.MutationStatus;
+import com.toddfast.mutagen.cassandra.impl.info.MigrationInfo;
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.datastax.driver.core.Row;
 
-public class MigrationResultValidation extends AbstractTest {
+public class SimpleMigrationTest extends AbstractTest {
     /**
      * Firstly,This test execute mutations.
      * Then it check the results of mutations.
@@ -27,10 +30,16 @@ public class MigrationResultValidation extends AbstractTest {
         checkLastTimestamp("201502011200");
 
         // Check database content
-        // TODO
         Row row1 = getByPk("row1");
         assertNotNull(row1);
         assertEquals("value1", row1.getString("value1"));
+
+        MigrationInfo[] migrationInfo = getMigrationInfo();
+        Assert.assertEquals(1, migrationInfo.length);
+        Assert.assertEquals("201502011200", migrationInfo[0].getVersion());
+        Assert.assertEquals("M201502011200_CreateTableTest_1000.cqlsh.txt", migrationInfo[0].getFilename());
+        Assert.assertEquals(MutationStatus.SUCCESS.getValue(), migrationInfo[0].getStatus());
+
     }
 
     @Test
@@ -46,9 +55,14 @@ public class MigrationResultValidation extends AbstractTest {
         checkLastTimestamp("201502011200");
 
         // Check database content
-        // TODO
         Row row1 = getByPk("row1");
         assertNotNull(row1);
         assertEquals("value1", row1.getString("value1"));
+
+        MigrationInfo[] migrationInfo = getMigrationInfo();
+        Assert.assertEquals(1, migrationInfo.length);
+        Assert.assertEquals("201502011200", migrationInfo[0].getVersion());
+        Assert.assertEquals("M201502011200_CreateTableTest_1000.java", migrationInfo[0].getFilename());
+        Assert.assertEquals(MutationStatus.SUCCESS.getValue(), migrationInfo[0].getStatus());
     }
 }

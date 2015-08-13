@@ -160,3 +160,10 @@ Then, clean with:
 ```
 mvn release:clean
 ```
+
+Industrialization on jenkins for example:
+```
+mvn release:clean release:prepare release:perform -DreleaseVersion=${releaseVersion} -DdevelopmentVersion=${developmentVersion}
+```
+   
+Full documentation on [plugin page](http://maven.apache.org/maven-release/maven-release-plugin/index.html)

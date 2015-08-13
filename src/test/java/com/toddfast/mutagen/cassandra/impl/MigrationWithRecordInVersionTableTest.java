@@ -1,10 +1,13 @@
 package com.toddfast.mutagen.cassandra.impl;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import com.toddfast.mutagen.cassandra.MutationStatus;
 import org.junit.Test;
 
 import com.toddfast.mutagen.Mutation;
@@ -27,9 +30,9 @@ public class MigrationWithRecordInVersionTableTest extends AbstractTest {
         DBUtils.createSchemaVersionTable(getSession());
         // append two version record
         DBUtils.appendVersionRecord(getSession(), "201502011200", "M201502011200_DoSomeThing_1111.cqlsh.txt",
-                "5ac70f706156a3264c518f0c7d754f7f", 112, "success");
+                "5ac70f706156a3264c518f0c7d754f7f", 112, MutationStatus.SUCCESS.getValue());
         DBUtils.appendVersionRecord(getSession(), "201502011209", "M201502011209_DoSomeThing_1111.cqlsh.txt", "",
-                112, "success");
+                112, MutationStatus.SUCCESS.getValue());
         // Execute mutations
         mutate("mutations/tests/execution");
 
@@ -38,8 +41,8 @@ public class MigrationWithRecordInVersionTableTest extends AbstractTest {
         for (Mutation<String> mutation : result.getCompletedMutations())
             mutations.add(mutation.getResultingState().getID());
 
-        assertEquals(false, mutations.contains("201502011200"));
-        assertEquals(true, mutations.contains("201502011210"));
+        assertFalse(mutations.contains("201502011200"));
+        assertTrue(mutations.contains("201502011210"));
      }
 
 

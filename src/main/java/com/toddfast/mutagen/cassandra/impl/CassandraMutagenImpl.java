@@ -185,9 +185,6 @@ public class CassandraMutagenImpl extends CassandraMutagen {
     /**
      * Retrives the complete information about all the migrations.
      * 
-     * @param getSession
-     *            ()
-     *            - the getSession() to execute the cql.
      * @return instance of MigrationInfoService.
      * 
      */

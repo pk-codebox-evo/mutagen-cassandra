@@ -3,6 +3,8 @@ package com.toddfast.mutagen.cassandra.util;
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ProtocolVersion;
 import com.datastax.driver.core.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -10,6 +12,8 @@ import java.util.List;
  * @author Manuel Boillod
  */
 public class CassandraUtils {
+
+    public static final Logger LOGGER = LoggerFactory.getLogger(CassandraUtils.class);
 
     /**
      * Create cluster.
@@ -26,6 +30,8 @@ public class CassandraUtils {
                                          boolean useCredentials,
                                          String dbuser,
                                          String dbpassword) {
+
+        LOGGER.info("Create cluster: contact points: " + clusterContactPoints + ", port: " + clusterPort + ", useCredentials: " + useCredentials);
 
         // get cluster builder
         Cluster.Builder clusterBuilder = Cluster.builder().withProtocolVersion(ProtocolVersion.V2);

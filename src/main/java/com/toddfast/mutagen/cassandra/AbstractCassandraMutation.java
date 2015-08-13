@@ -120,12 +120,11 @@ public abstract class AbstractCassandraMutation implements Mutation<String> {
      * 
      */
     @Override
-    public final void mutate(Context context)
-            throws MutagenException {
+    public final void mutate(Context context) {
 
         LOGGER.trace("Entering mutate(context={})", context);
 
-        MutagenException mutagenException = null;
+        RuntimeException mutateException = null;
         // Perform the mutation
         boolean success = true;
         long startTime = System.currentTimeMillis();
@@ -133,10 +132,9 @@ public abstract class AbstractCassandraMutation implements Mutation<String> {
             LOGGER.trace("Entering performMutation(context={})", context);
             performMutation(context);
             LOGGER.trace("Leaving performMutation()");
-
-        } catch (MutagenException e) {
+        } catch (RuntimeException e) {
             success = false;
-            mutagenException = e;
+            mutateException = e;
         }
 
         long endTime = System.currentTimeMillis();
@@ -150,10 +148,10 @@ public abstract class AbstractCassandraMutation implements Mutation<String> {
         // append version record
         if (!isIgnoreDB()) {
             DBUtils.appendVersionRecord(session, version, getResourceName(), checksum, (int) execution_time,
-                    (success ? "Success" : "Failed"));
+                    (success ? MutationStatus.SUCCESS.getValue() : MutationStatus.FAILED.getValue()));
         }
-        if (mutagenException != null) {
-            throw mutagenException;
+        if (mutateException != null) {
+            throw mutateException;
         }
 
         LOGGER.trace("Leaving mutate()");

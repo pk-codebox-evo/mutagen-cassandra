@@ -9,10 +9,11 @@ import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.exceptions.InvalidQueryException;
+import com.toddfast.mutagen.cassandra.MutationStatus;
 
 public class MigrationInfoServiceImpl implements MigrationInfoService {
 
-    private List<MigrationInfoImpl> migrationInfos = new ArrayList<MigrationInfoImpl>();
+    private List<MigrationInfoImpl> migrationInfos = new ArrayList<>();
 
     private final Session session;
 
@@ -62,8 +63,9 @@ public class MigrationInfoServiceImpl implements MigrationInfoService {
         if (resultSet != null) {
             Row[] rows = resultSet.all().toArray(new Row[resultSet.all().size()]);
             Arrays.sort(rows, COMPARATOR);
-            for (int i = 0; i < rows.length; i++)
-                migrationInfos.add(new MigrationInfoImpl(rows[i]));
+            for (Row row : rows) {
+                migrationInfos.add(new MigrationInfoImpl(row));
+            }
         }
     }
 
@@ -86,9 +88,9 @@ public class MigrationInfoServiceImpl implements MigrationInfoService {
 
     @Override
     public MigrationInfo[] success() {
-        List<MigrationInfoImpl> successMigrations = new ArrayList<MigrationInfoImpl>();
+        List<MigrationInfoImpl> successMigrations = new ArrayList<>();
         for (MigrationInfoImpl migrationInfoImpl : migrationInfos) {
-            if (migrationInfoImpl.getStatus() != "failed")
+            if (!migrationInfoImpl.getStatus().equals(MutationStatus.FAILED.getValue()))
                 successMigrations.add(migrationInfoImpl);
         }
         return successMigrations.toArray(new MigrationInfoImpl[successMigrations.size()]);
@@ -96,7 +98,7 @@ public class MigrationInfoServiceImpl implements MigrationInfoService {
 
     @Override
     public MigrationInfo failed() {
-        if (migrationInfos.get(migrationInfos.size() - 1).getStatus().equals("failed")) {
+        if (migrationInfos.get(migrationInfos.size() - 1).getStatus().equals(MutationStatus.FAILED.getValue())) {
             return migrationInfos.get(migrationInfos.size() - 1);
         }
         return null;
@@ -108,13 +110,13 @@ public class MigrationInfoServiceImpl implements MigrationInfoService {
         if (migrationInfos.isEmpty())
             return "no migrations found";
 
-        StringBuffer stringBuffer = new StringBuffer();
-        stringBuffer.append("Info.....\n");
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("Info.....\n");
 
         for (MigrationInfoImpl migrationInfoImpl : migrationInfos) {
-            stringBuffer.append(migrationInfoImpl.toString());
+            stringBuilder.append(migrationInfoImpl.toString());
         }
 
-        return stringBuffer.toString();
+        return stringBuilder.toString();
     }
 }

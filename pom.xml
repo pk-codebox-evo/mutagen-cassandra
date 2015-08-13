@@ -28,6 +28,19 @@
         </license>
     </licenses>
 
+    <repositories>
+        <repository>
+            <id>nexus-releases</id>
+            <name>Nexus Release Repository</name>
+            <url>http://54.148.243.109:8081/nexus/content/repositories/releases/</url>
+        </repository>
+        <repository>
+            <id>nexus-snapshots</id>
+            <name>Nexus Snapshot Repository</name>
+            <url>http://54.148.243.109:8081/nexus/content/repositories/snapshots/</url>
+        </repository>
+    </repositories>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>

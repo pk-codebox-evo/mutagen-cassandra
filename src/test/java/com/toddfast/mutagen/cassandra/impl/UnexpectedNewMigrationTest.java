@@ -1,5 +1,6 @@
 package com.toddfast.mutagen.cassandra.impl;
 
+import com.toddfast.mutagen.cassandra.MutationStatus;
 import org.junit.Test;
 
 import com.toddfast.mutagen.MutagenException;
@@ -17,7 +18,7 @@ public class UnexpectedNewMigrationTest extends AbstractTest {
         DBUtils.createSchemaVersionTable(getSession());
 
         // mutation with versionId ending with 2
-        DBUtils.appendVersionRecord(getSession(), "201501010002", "Foo", "", 0, "success");
+        DBUtils.appendVersionRecord(getSession(), "201501010002", "Foo", "", 0, MutationStatus.SUCCESS.getValue());
 
         // try to mutate with script ending in 1
         mutate("mutations/tests/unexpected_new_migration");
