@@ -10,7 +10,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class SubFolderMigrationTest extends AbstractTest {
+public class SubFoldersMigrationTest extends AbstractTest {
 
     @Test
     public void execute_folder_v1_then_v2() {
