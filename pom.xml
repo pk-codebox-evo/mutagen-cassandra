@@ -3,7 +3,7 @@
 
     <groupId>org.restlet</groupId>
     <artifactId>mutagen-cassandra</artifactId>
-    <version>0.1.5</version>
+    <version>0.1.6-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>restlet-mutagen-cassandra</name>
@@ -17,7 +17,7 @@
         <url>https://github.com/restlet/mutagen-cassandra</url>
         <connection>scm:git:git@github.com:restlet/mutagen-cassandra.git</connection>
         <developerConnection>scm:git:git@github.com:restlet/mutagen-cassandra.git</developerConnection>
-        <tag>v0.1.5</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <licenses>
