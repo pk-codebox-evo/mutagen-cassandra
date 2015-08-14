@@ -33,11 +33,11 @@ public class MutagenUtils {
         }
     }
 
-    public static void printMutations(String title, List<Mutation<String>> mutations) {
-        LOGGER.info(title + Collections2.transform(mutations, new Function<Mutation<?>, String>() {
+    public static <I extends Comparable<I>> void printMutations(String title, List<Mutation<I>> mutations) {
+        LOGGER.info(title + Collections2.transform(mutations, new Function<Mutation<I>, String>() {
             @Override
-            public String apply(Mutation<?> mutation) {
-                return "\n\t- " + mutation;
+            public String apply(Mutation<I> mutation) {
+                return "\n\t- " + mutation.toString();
             }
         }));
     }

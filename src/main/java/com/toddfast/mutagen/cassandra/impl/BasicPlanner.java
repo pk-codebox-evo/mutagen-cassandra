@@ -17,6 +17,7 @@ import com.toddfast.mutagen.State;
 import com.toddfast.mutagen.Subject;
 import com.toddfast.mutagen.basic.BasicContext;
 import com.toddfast.mutagen.cassandra.AbstractCassandraMutation;
+import com.toddfast.mutagen.cassandra.utils.MutagenUtils;
 
 /**
  * Generates basic plans using the initial list of mutations and the specified
@@ -60,17 +61,16 @@ public class BasicPlanner<I extends Comparable<I>> implements Planner<I> {
     @Override
     public Plan<I> getPlan(Subject<I> subject, Coordinator<I> coordinator) {
 
-        List<Mutation<I>> subjectMutations = new ArrayList<>(mutations);
+        List<Mutation<I>> subjectMutations = new ArrayList<>();
 
         // Filter out the mutations that are unacceptable to the subject
-        for (Iterator<Mutation<I>> i = subjectMutations.iterator(); i.hasNext();) {
-
-            Mutation<I> mutation = i.next();
+        for (Mutation<I> mutation : mutations) {
             if (!coordinator.accept(subject, mutation.getResultingState())) {
-                i.remove();
+                subjectMutations.add(mutation);
             }
         }
 
+        MutagenUtils.printMutations("Planned mutation:", subjectMutations);
         return new BasicPlan(subject, coordinator, subjectMutations);
     }
 
