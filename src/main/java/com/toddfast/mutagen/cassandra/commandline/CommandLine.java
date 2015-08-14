@@ -66,10 +66,13 @@ public class CommandLine {
         if ("clean".equals(operation)) {
             mutagen.clean();
         } else if ("baseline".equals(operation)) {
-            loadResources(mutagen);
-            mutagen.baseline();
+            try {
+                mutagen.initialize();
+            } catch (IOException e) {
+                throw new RuntimeException("Can not load resources", e);
+            }            mutagen.baseline();
         } else if ("migrate".equals(operation)) {
-            String location = setLocation(mutagen);
+            String location = mutagen.getLocation();
             Result<String> mutationResult = mutagen.migrate(location);
             MutagenUtils.showMigrationResults(mutationResult);
             MutagenException mutationResultException = mutationResult.getException();
@@ -146,37 +149,6 @@ public class CommandLine {
         } catch (Exception e) {
             throw new RuntimeException("Can not load " + path, e);
         }
-    }
-
-    /**
-     * Load resources.
-     */
-    protected void loadResources(CassandraMutagen mutagen) {
-        try {
-            setLocation(mutagen);
-            mutagen.initialize();
-        } catch (IOException e) {
-            LOGGER.error("Can not load resources");
-            throw new RuntimeException("Can not load resources");
-        }
-    }
-
-    /**
-     */
-    protected String setLocation(CassandraMutagen mutagen) {
-        String location = mutagen.getLocation();
-        if (location == null) {
-            throw new IllegalArgumentException("no location");
-        }
-        if (location.lastIndexOf("/") == location.length() - 1) {
-            location = location.substring(0, location.length() - 1);
-        }
-        if (location.lastIndexOf("/") > 0) {
-            location = location.substring(location.lastIndexOf("/") + 1, location.length());
-        }
-
-        mutagen.setLocation(location);
-        return location;
     }
 
     /**
