@@ -123,14 +123,7 @@ public class CassandraMutagenImpl extends CassandraMutagen {
             throw new RuntimeException("Can not load scripts");
         }
         // migrate
-        Plan.Result<String> result = null;
-        try {
-            result = this.mutate(ignoreDB);
-        } catch (Exception e) {
-            System.out.println("ERROR:" + e.getMessage());
-        }
-
-        return result;
+        return this.mutate(ignoreDB);
     }
 
     @Override
