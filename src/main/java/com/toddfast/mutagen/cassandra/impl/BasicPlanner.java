@@ -65,7 +65,7 @@ public class BasicPlanner<I extends Comparable<I>> implements Planner<I> {
 
         // Filter out the mutations that are unacceptable to the subject
         for (Mutation<I> mutation : mutations) {
-            if (!coordinator.accept(subject, mutation.getResultingState())) {
+            if (coordinator.accept(subject, mutation.getResultingState())) {
                 subjectMutations.add(mutation);
             }
         }

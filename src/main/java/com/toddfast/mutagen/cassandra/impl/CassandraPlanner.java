@@ -6,10 +6,10 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import com.toddfast.mutagen.cassandra.utils.MutagenUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -236,48 +236,45 @@ public class CassandraPlanner extends BasicPlanner<String> {
             Coordinator<String> coordinator) {
 
         LOGGER.trace("Entering getPlan(subject={}, coordinator={})", subject, coordinator);
-
-        List<Mutation<String>> subjectMutations = new ArrayList<>(getMutations());
+        List<Mutation<String>> subjectMutations = new ArrayList<>();
 
         // Filter out the mutations that are unacceptable to the subject
-        for (Iterator<Mutation<String>> i = subjectMutations.iterator(); i.hasNext();) {
-
-            Mutation<String> mutation = i.next();
+        for (Mutation<String> mutation : getMutations()) {
             State<String> targetState = mutation.getResultingState();
             LOGGER.debug("Evaluating mutation {}", mutation);
             // Check by state first
-            if (!coordinator.accept(subject, targetState)) {
+            if (coordinator.accept(subject, targetState)) {
+                subjectMutations.add(mutation);
+            } else {
 
                 // For older states, verify its presence in the database
-                if (DBUtils.isVersionIdPresent(session, targetState.getID())) {
-
-                    // Check that the md5 hash of the already executed mutation hasn't changed
-                    if (DBUtils.isMutationHashCorrect(session, targetState.getID(),
-                            ((AbstractCassandraMutation) mutation).getChecksum())) {
-                        LOGGER.debug("Rejecting mutation {}", mutation);
-                        i.remove();
-                    }
-                    else
-                        throw new MutagenException("Checksum incorrect for already executed mutation : "
-                                + targetState);
-                }
-                else {
+                if (!DBUtils.isVersionIdPresent(session, targetState.getID())) {
                     throw new MutagenException(
                             "Mutation has state (state=" + targetState.getID() + ")"
                                     + " inferior to current state (state="
                                     + subject.getCurrentState().getID() + ") but was not recorded in the database");
                 }
 
+                // Check that the md5 hash of the already executed mutation hasn't changed
+                if (!DBUtils.isMutationHashCorrect(session, targetState.getID(),
+                        ((AbstractCassandraMutation) mutation).getChecksum())) {
+                    throw new MutagenException("Checksum incorrect for already executed mutation : "
+                            + targetState);
+                }
+
+                LOGGER.debug("Rejecting mutation (already executed): {}", mutation);
             }
-            
+
             //Test that the mutation hasn't been executed with errors before
-            if (DBUtils.isMutationFailed(session, targetState.getID()))
-                    throw new MutagenException("There is a failed mutation in database for script : " + mutation.toString());
+            if (DBUtils.isMutationFailed(session, targetState.getID())) {
+                throw new MutagenException("There is a failed mutation in database for script : " + mutation.toString());
+            }
         }
+
+        MutagenUtils.printMutations("Planned mutation:", subjectMutations);
 
         BasicPlan basicPlan = new BasicPlan(subject, coordinator, subjectMutations);
         LOGGER.trace("Leaving getPlan(subject={}, coordinator={})", subject, coordinator);
-
         return basicPlan;
     }
 }
