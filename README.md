@@ -34,7 +34,7 @@ Examples:
 - M201502011200_RemoveStrategyLoad_2627.cqlsh.txt
 - M201502011201_RemoveStrategyLoad_2627.java
 
-Lastly,you should put the `.cqlsh.txt` files and `.java` files under the same source roots. Mutagen will compile the `.java` file into `.class` file. 
+Lastly,you should put the `.cqlsh.txt` files and `.java` files under the same source roots. Mutagen will compile the `.java` file into `.class` file.
 
 ### 3. Mutate!
 
@@ -51,7 +51,7 @@ try {
 
 	// Mutate! Note, this method may not throw an exception.
 	Plan.Result<Integer> result = mutagen.mutate(session);
-	
+
 	// Inspect result, especially for an exception
 	if (result.getException() != null) {
 		// Throw an exception
@@ -141,29 +141,24 @@ The proper thing is for Mutagen Cassandra to handle this coordination via a clus
 Release
 -------
 
-To tag repo and bump version, do:
+To tag repo, bump version, and push commits do:
 ```
 mvn release:clean release:prepare
 ```
 
-Alternative to use default settings and execute script in a non-interactive mode
+Alternative to use default settings and execute script in a non-interactive mode (do not ask for version number)
 ```
 mvn --batch-mode release:clean release:prepare
 ```
 
-To deploy tag artefacts, do:
+To deploy tag artefacts (will also clean up the repo) do:
 ```
 mvn release:perform
 ```
 
-Then, clean with:
+If needed, clean with:
 ```
 mvn release:clean
-```
-
-And push to remote repository
-```
-git push
 ```
 
 
@@ -171,5 +166,5 @@ Industrialization on jenkins for example:
 ```
 mvn release:clean release:prepare release:perform -DreleaseVersion=${releaseVersion} -DdevelopmentVersion=${developmentVersion}
 ```
-   
+
 Full documentation on [plugin page](http://maven.apache.org/maven-release/maven-release-plugin/index.html)
