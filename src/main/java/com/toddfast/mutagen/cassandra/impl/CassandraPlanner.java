@@ -44,7 +44,7 @@ public class CassandraPlanner extends BasicPlanner<String> {
      *            script files to migrate.
      * 
      */
-    protected CassandraPlanner(Session session,
+    public CassandraPlanner(Session session,
             List<String> mutationResources) {
         super(loadMutations(session, mutationResources), null);
         this.session = session;
@@ -266,8 +266,10 @@ public class CassandraPlanner extends BasicPlanner<String> {
             }
 
             //Test that the mutation hasn't been executed with errors before
-            if (DBUtils.isMutationFailed(session, targetState.getID())) {
-                throw new MutagenException("There is a failed mutation in database for script : " + mutation.toString());
+            if (!isIgnoreDB()) {
+                if (DBUtils.isMutationFailed(session, targetState.getID())) {
+                    throw new MutagenException("There is a failed mutation in database for script : " + mutation.toString());
+                }
             }
         }
 

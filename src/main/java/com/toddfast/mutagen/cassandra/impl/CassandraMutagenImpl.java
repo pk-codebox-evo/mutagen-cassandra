@@ -74,7 +74,7 @@ public class CassandraMutagenImpl extends CassandraMutagen {
      */
     public Plan<String> getMutationsPlan(boolean ignoreDB) {
         LOGGER.trace("Entering getMutationsPlan(session={})", getSession());
-        CassandraCoordinator coordinator = new CassandraCoordinator(getSession());
+        CassandraCoordinator coordinator = new CassandraCoordinator();
         CassandraSubject subject = new CassandraSubject(getSession());
 
         CassandraPlanner planner = new CassandraPlanner(getSession(), getResources());

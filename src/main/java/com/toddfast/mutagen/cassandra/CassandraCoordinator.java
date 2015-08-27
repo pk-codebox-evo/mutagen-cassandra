@@ -20,30 +20,10 @@ public class CassandraCoordinator implements Coordinator<String> {
     // //////////////////////////////////////////////////////////////////////////
 
     private static Logger LOGGER = LoggerFactory.getLogger(CassandraCoordinator.class);
-    private Session session; // session
     /**
      * Constructor for cassandra coordinator.
-     * 
-     * @param session
-     *            the session to execute cql statements
      */
-    public CassandraCoordinator(Session session) {
-        super();
-        if (session == null) {
-            throw new IllegalArgumentException(
-                    "Parameter \"session\" cannot be null");
-        }
-
-        this.session = session;
-    }
-
-    /**
-     * A getter method to get session.
-     * 
-     * @return session
-     */
-    public Session getSession() {
-        return session;
+    public CassandraCoordinator() {
     }
 
     /**
@@ -53,8 +33,7 @@ public class CassandraCoordinator implements Coordinator<String> {
      *         true or false
      */
     @Override
-    public boolean accept(Subject<String> subject,
-            State<String> targetState) {
+    public boolean accept(Subject<String> subject, State<String> targetState) {
         LOGGER.trace("Entering  accept(subject={}, targetState={})", subject, targetState);
 
         State<String> currentState = subject.getCurrentState();
