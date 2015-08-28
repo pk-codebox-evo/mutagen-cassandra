@@ -1,7 +1,10 @@
 package com.toddfast.mutagen.cassandra;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Paths;
+import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.regex.Matcher;
@@ -166,12 +169,12 @@ public abstract class AbstractCassandraMutation implements Mutation<String> {
     /**
      * Generate the MD5 hash for a key.
      * 
-     * @param key
+     * @param inputStream
      *            the string to be hashed.
      * @return
      *         the MD5 hash for the key.
      */
-    public static byte[] md5(String key) {
+    public static byte[] md5(InputStream inputStream) {
         MessageDigest algorithm;
         try {
             algorithm = MessageDigest.getInstance("MD5");
@@ -179,12 +182,12 @@ public abstract class AbstractCassandraMutation implements Mutation<String> {
             throw new RuntimeException(ex);
         }
 
-        algorithm.reset();
 
+        DigestInputStream digestInputStream = new DigestInputStream(inputStream, algorithm);
         try {
-            algorithm.update(key.getBytes("UTF-8"));
-        } catch (UnsupportedEncodingException ex) {
-            throw new RuntimeException(ex);
+            while (digestInputStream.read() != -1){}
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
 
         //messageDigest
@@ -193,14 +196,14 @@ public abstract class AbstractCassandraMutation implements Mutation<String> {
 
     /**
      * change the hash of a key into hexadecimal format
-     * 
-     * @param key
-     *            the string to be hashed.
+     *
+     * @param inputStream
+     *            the inputStream to be hashed.
      * @return
      *         the hexadecimal format of hash of a key.
      */
-    public static String md5String(String key) {
-        byte[] messageDigest = md5(key);
+    public static String md5String(InputStream inputStream) {
+        byte[] messageDigest = md5(inputStream);
         return toHex(messageDigest);
     }
 
