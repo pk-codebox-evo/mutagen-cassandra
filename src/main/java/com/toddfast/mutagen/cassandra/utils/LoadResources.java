@@ -2,6 +2,8 @@ package com.toddfast.mutagen.cassandra.utils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -110,7 +112,7 @@ public class LoadResources {
 
                 if (resource.endsWith(".class") || resource.endsWith(".java")) {
                     // Remove the file path
-                    resource = resource.substring(resource.indexOf(rootResourcePath));
+                    resource = relativize(resource, rootResourcePath);
                     if (resource.contains("$")) {
                         // skip inner classes
                         continue;
@@ -123,5 +125,23 @@ public class LoadResources {
                     "path \"" + rootResourcePath + "\"", e);
         }
         return resources;
+    }
+
+    /**
+     * Returns a new path that points to the same location as the first parameter, but starts with the second parameter.
+     * If the second parameter is not contained in the first, returns an empty string.
+     *
+     * This is equivalent to pathToRelativize.substring(pathToRelativize.indexOf(root)), except
+     * that it will correctly handle the case where the two paths don't use the same separator.
+     *
+     * Example: x/y/z/a/b/c/d/e, a/b/c -> a/b/c/d/e
+     */
+    private static String relativize(String pathToRelativize, String root) {
+        Path rootPath = Paths.get(root);
+        Path result = Paths.get(pathToRelativize);
+        while (result.getNameCount() > 1 && !result.startsWith(rootPath)) {
+            result = result.subpath(1, result.getNameCount());
+        }
+        return result.toString();
     }
 }
