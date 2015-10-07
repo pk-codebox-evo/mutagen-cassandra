@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.base.Joiner;
 import com.toddfast.mutagen.cassandra.utils.MutagenUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -165,8 +166,8 @@ public class CassandraPlanner extends BasicPlanner<String> {
 
         assert resource.endsWith(".class") : "Class resource name \"" + resource + "\" should end with .class";
 
-        int index = resource.indexOf(".class");
-        String className = resource.substring(0, index).replace('/', '.');
+        int index = resource.lastIndexOf(".class");
+        String className = Joiner.on('.').join(Paths.get(resource.substring(0, index)));
 
         // Load the class specified by the resource
         Class<?> clazz;
