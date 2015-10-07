@@ -32,6 +32,13 @@ dependency-reduced-pom.xml
 
 
 #################
+## IntelliJ
+#################
+*.iml
+.idea/
+
+
+#################
 ## Visual Studio
 #################
 
