@@ -327,36 +327,36 @@ public class CommandLine {
      * Prints the usage instructions on the console.
      */
     protected void printUsage() {
-        LOGGER.info("********");
-        LOGGER.info("* Usage");
-        LOGGER.info("********");
-        LOGGER.info("");
-        LOGGER.info("mutagen [options] command");
-        LOGGER.info("");
-        LOGGER.info("By default, the configuration will be read from conf/mutagen.conf.");
-        LOGGER.info("Options passed from the command-line override the configuration.");
-        LOGGER.info("");
-        LOGGER.info("Commands");
-        LOGGER.info("========");
-        LOGGER.info("migrate  : Migrates the database");
-        LOGGER.info("clean    : Drops all objects in the configured schemas");
-        LOGGER.info("info     : Prints the information about applied, current and pending migrations");
-        LOGGER.info("baseline : Baselines an existing database at the baselineVersion");
-        LOGGER.info("repair   : Repairs the metadata table");
-        LOGGER.info("");
-        LOGGER.info("Options (Format: -key=value)");
-        LOGGER.info("=======");
-        LOGGER.info("baselineVersion        : Version to tag schema with when executing baseline");
-        LOGGER.info("location               : Classpath locations to sacn recursively for migrations");
-        LOGGER.info("");
-        LOGGER.info("Add -I to print info output");
-        LOGGER.info("Add -X to print debug output");
-        LOGGER.info("Add -q to suppress all output, except for errors and warnings");
-        LOGGER.info("");
-        LOGGER.info("Example");
-        LOGGER.info("=======");
-        LOGGER.info("mutagen -baselineVersion=201412311234 baseline");
-        LOGGER.info("mutagen -location=/path/mutations migrate");
-        LOGGER.info("");
+        System.out.println("********");
+        System.out.println("* Usage");
+        System.out.println("********");
+        System.out.println("");
+        System.out.println("mutagen [options] command");
+        System.out.println("");
+        System.out.println("By default, the configuration will be read from conf/mutagen.conf.");
+        System.out.println("Options passed from the command-line override the configuration.");
+        System.out.println("");
+        System.out.println("Commands");
+        System.out.println("========");
+        System.out.println("migrate  : Migrates the database");
+        System.out.println("clean    : Drops all objects in the configured schemas");
+        System.out.println("info     : Prints the information about applied, current and pending migrations");
+        System.out.println("baseline : Baselines an existing database at the baselineVersion");
+        System.out.println("repair   : Repairs the metadata table");
+        System.out.println("");
+        System.out.println("Options (Format: -key=value)");
+        System.out.println("=======");
+        System.out.println("baselineVersion        : Version to tag schema with when executing baseline");
+        System.out.println("location               : Classpath locations to sacn recursively for migrations");
+        System.out.println("");
+        System.out.println("Add -I to print info output");
+        System.out.println("Add -X to print debug output");
+        System.out.println("Add -q to suppress all output, except for errors and warnings");
+        System.out.println("");
+        System.out.println("Example");
+        System.out.println("=======");
+        System.out.println("mutagen -baselineVersion=201412311234 baseline");
+        System.out.println("mutagen -location=/path/mutations migrate");
+        System.out.println("");
     }
 }

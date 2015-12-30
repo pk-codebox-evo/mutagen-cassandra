@@ -47,7 +47,7 @@
             <version>0.3.0</version>
         </dependency>
 
-        <!--datastax drive for cassandra -->
+        <!--datastax driver for cassandra -->
         <dependency>
             <groupId>com.datastax.cassandra</groupId>
             <artifactId>cassandra-driver-core</artifactId>
@@ -74,18 +74,20 @@
             <version>1.7.12</version>
         </dependency>
 
+        <!-- optionals -->
+
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>1.1.3</version>
-            <!-- <scope>test</scope> -->
+            <optional>true</optional>
         </dependency>
 
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-core</artifactId>
             <version>1.1.3</version>
-            <!-- <scope>test</scope> -->
+            <optional>true</optional>
         </dependency>
 
         <!-- tests -->
