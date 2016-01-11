@@ -60,11 +60,11 @@ public class CqlMutation extends AbstractCassandraMutation {
     /**
      * Divide the script file end with .cqlsh.txt into statements.
      */
-    private List<String> getCQLStatements() {
+    public static List<String> extractCQLStatements(InputStream inputStream) {
         List<String> statements = new ArrayList<>();
 
-        try (InputStream resourceInputStream = getResourceInputStream()) {
-            List<String> lines = CharStreams.readLines(new InputStreamReader(resourceInputStream, Charsets.UTF_8));
+        try {
+            List<String> lines = CharStreams.readLines(new InputStreamReader(inputStream, Charsets.UTF_8));
             StringBuilder statement = new StringBuilder();
             for (String line : lines) {
                 int index;
@@ -138,7 +138,7 @@ public class CqlMutation extends AbstractCassandraMutation {
     protected void performMutation(Context context) {
         context.info("Executing mutation {}", getResultingState().getID());
 
-        List<String> statements = getCQLStatements();
+        List<String> statements = extractCQLStatements(getResourceInputStream());
 
         for (String statement : statements) {
             context.debug("Executing CQL statement \"{}\"", statement);
